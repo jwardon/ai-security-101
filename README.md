@@ -27,4 +27,4 @@ AI Security 101 is a practical introduction to the concepts needed to understand
 
 **Behavioral testing catches what static controls miss.** A model can have the expected hash and still contain a backdoor, and a system can drift without an intentional deployment. Re-run stable tests over time and investigate meaningful changes in outputs, retrieval, refusals, or tool use.
 
-Secure the whole AI system, not only the model. The highest-impact failures often occur in surrounding software: exposed notebooks, weak RAG authorization, poisoned data, unsafe serialization, vulnerable dependencies, or over-privileged tools. Follow the data, artifacts, identities, and authority across the full lifecycle.
+**Secure the whole AI system, not only the model**. The highest-impact failures often occur in surrounding software: exposed notebooks, weak RAG authorization, poisoned data, unsafe serialization, vulnerable dependencies, or over-privileged tools. Follow the data, artifacts, identities, and authority across the full lifecycle.
