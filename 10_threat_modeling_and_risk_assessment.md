@@ -1,0 +1,25 @@
+# 10. Threat Modeling and Risk Assessment
+
+Threat modeling turns the architecture into a security model. A common starting point is to map actors, components, data stores, data flows, and trust boundaries so the team can see where trust changes and where an attacker can interact with or influence the system.
+
+From that model, identify what can go wrong: which external or untrusted inputs can reach each component, which identities and privileges are involved, what data or artifacts could be modified or disclosed, and what actions an attacker could cause. Then map preventive, detective, limiting, and recovery controls to those threats.
+
+Finally, assess likelihood and impact and record residual risk—the risk that remains after controls have been applied. Threat models age. Architecture, data sources, models, tools, and controls change over time, so revisit the model as the system changes.
+
+```text
+data sourcing -> ingestion -> training -> evaluation -> artifact storage / distribution
+      -> deployment -> inference / RAG / agents -> monitoring / updates
+```
+
+## Frameworks that help
+
+No single framework covers every part of AI security. These three are useful for different purposes:
+
+- **STRIDE - broad system threat categories.** STRIDE prompts reviewers to consider Spoofing (pretending to be another identity), Tampering (unauthorized modification), Repudiation (actions that cannot be reliably attributed or proven), Information Disclosure (unauthorized exposure), Denial of Service (making a resource unavailable), and Elevation of Privilege (gaining permissions beyond those intended). It is useful for systematically reviewing components, data flows, and trust boundaries.
+- **MITRE ATLAS - adversary behavior against AI-enabled systems.** ATLAS is a living knowledge base of AI-focused adversary tactics and techniques. Use it when asking how a real attacker might achieve an objective against models, data, or AI-enabled applications, and when planning threat-informed testing or red-team scenarios.
+- **OWASP GenAI / LLM guidance - recurring application risks and mitigations.** OWASP organizes common implementation risks such as prompt injection, sensitive-information disclosure, supply-chain weaknesses, and excessive agency. It is useful as an application-security checklist and mitigation reference, especially for generative-AI systems.
+They overlap but are not interchangeable. STRIDE helps find broad threat classes in your architecture; ATLAS adds concrete AI adversary behaviors and attack paths; OWASP helps check common GenAI implementation risks and practical mitigations. A reasonable review may use one, two, or all three depending on scope—there is no industry requirement to run them in a fixed sequence.
+
+## Risk assessment
+
+Prioritize findings using likelihood and impact, then record residual risk after controls are applied. Likelihood depends on exposure, required access, attacker capability, prerequisites, reliability, and existing defenses. Impact depends on what can be disclosed, modified, executed, disrupted, or reached across users, tenants, and privileges. Residual risk is the risk that remains after planned controls reduce likelihood or impact.
