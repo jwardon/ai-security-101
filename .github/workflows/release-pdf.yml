@@ -52,7 +52,7 @@ jobs:
             n=$((n + 1))
             version="${date_part}.${n}"
           done
-          prev_tag="$(gh api "repos/${GITHUB_REPOSITORY}/releases/latest" --jq .tag_name 2>/dev/null || true)"
+          prev_tag="$(gh release view --repo "${GITHUB_REPOSITORY}" --json tagName --jq .tagName 2>/dev/null || true)"
           if [ -n "$prev_tag" ]; then
             git fetch --no-tags origin "refs/tags/${prev_tag}:refs/tags/${prev_tag}"
           fi
