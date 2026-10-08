@@ -39,12 +39,11 @@ combined="$out/ai-security-101.md"
 } > "$combined"
 
 pandoc "$combined" \
-  --from gfm \
+  --from markdown-smart-tex_math_dollars-raw_tex-yaml_metadata_block+autolink_bare_uris+pipe_tables \
   --pdf-engine=xelatex \
   --toc --toc-depth=2 \
   --metadata title="AI Security 101" \
   --metadata subtitle="Version $version" \
-  --metadata date="$version" \
   -V documentclass=report \
   -V geometry:margin=1in \
   -V fontsize=11pt \
