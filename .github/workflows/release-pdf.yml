@@ -42,7 +42,7 @@ jobs:
       - name: Install build tools
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends pandoc texlive-xetex texlive-latex-recommended lmodern fonts-dejavu jq
+          sudo apt-get install -y --no-install-recommends pandoc texlive-xetex texlive-latex-recommended texlive-fonts-recommended lmodern fonts-dejavu jq
 
       - name: Determine version and previous release
         id: version
