@@ -5,7 +5,7 @@ The Markdown files are the canonical source. The **Release PDF** workflow (`.git
 ## Workflow behavior
 
 - **Pull requests** (touching Markdown, `scripts/`, or the workflow): build and validate the PDF, then upload it as the `ai-security-101-pdf` Actions artifact. Download it from the workflow run to inspect it before merging. No release is created.
-- **Pushes to `main`**: build the PDF the same way, then publish that exact PDF as a GitHub Release. Releases are only ever created from `main`.
+- **Pushes to `main`**: when the guide content (`README.md`, `NN_*.md` chapters) or the build/release machinery (`scripts/`, this workflow) changes, build the PDF the same way, then publish that exact PDF as a GitHub Release. Other changes, such as issue templates or `AGENTS.md`, do not create a release. Releases are only ever created from `main`.
 - **Manual runs** (`workflow_dispatch`): build and upload the artifact only.
 
 ## Versioning
