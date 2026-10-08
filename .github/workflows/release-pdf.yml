@@ -1,0 +1,78 @@
+name: Release PDF
+
+on:
+  workflow_dispatch:
+    inputs:
+      summary:
+        description: "Short summary of this revision (shown in the Revisions section and release notes)"
+        required: true
+        type: string
+
+permissions: {}
+
+concurrency:
+  group: release-pdf
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build and publish PDF
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends pandoc texlive-xetex texlive-latex-recommended lmodern fonts-dejavu jq
+
+      - name: Determine version
+        id: version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          date_part="$(date -u +%F)"
+          tags="$(gh api --paginate "repos/${GITHUB_REPOSITORY}/git/matching-refs/tags/${date_part}" --jq '.[].ref' | sed 's|^refs/tags/||')"
+          version="$date_part"
+          n=1
+          while grep -qxF "$version" <<<"$tags"; do
+            n=$((n + 1))
+            version="${date_part}.${n}"
+          done
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Generate revision history
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SUMMARY: ${{ inputs.summary }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          mkdir -p build
+          summary="$(tr '\r\n' '  ' <<<"$SUMMARY" | sed 's/  */ /g; s/^ //; s/ $//')"
+          {
+            printf -- '- **%s** (%s) — @%s: %s\n' "$VERSION" "$(date -u +%F)" "$GITHUB_ACTOR" "$summary"
+            gh api --paginate "repos/${GITHUB_REPOSITORY}/releases" \
+              --jq '.[] | select(.draft == false) | [.tag_name, .published_at[0:10], .author.login, ((.body // "") | gsub("[\r\n]+"; " "))] | @tsv' |
+              while IFS=$'\t' read -r tag date author body; do
+                printf -- '- **%s** (%s) — @%s: %s\n' "$tag" "$date" "$author" "$body"
+              done
+          } > build/revisions.md
+
+      - name: Build PDF
+        run: scripts/build_pdf.sh "${{ steps.version.outputs.version }}" build/revisions.md
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SUMMARY: ${{ inputs.summary }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          gh release create "$VERSION" \
+            "build/ai-security-101-${VERSION}.pdf" \
+            --target "$GITHUB_SHA" \
+            --title "AI Security 101 — $VERSION" \
+            --notes "$SUMMARY"
