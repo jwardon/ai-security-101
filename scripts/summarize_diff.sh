@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 # Print a one-line summary of the diff between a previous release and HEAD.
 # Usage: scripts/summarize_diff.sh <previous-ref>
-# The summary is derived only from the diff. If GITHUB_TOKEN can call GitHub
-# Models (needs the `models: read` permission), the diff is summarized by a model;
-# otherwise a deterministic summary is assembled from changed content.
+# Guide-content changes require a semantic summary from GitHub Models. Build-only
+# changes get a separate deterministic summary.
 set -euo pipefail
 
 prev="${1:-}"
@@ -22,38 +21,34 @@ if git diff --quiet "$prev" HEAD; then
   exit 0
 fi
 
-fallback() {
-  local additions removals content label
-  additions="$(git diff --no-color --unified=0 "$prev" HEAD |
-    awk '/^\+\+\+ / { next } /^\+/ { print substr($0, 2) }' |
-    sed -E 's/\[([^]]+)\]\([^)]*\)/\1/g; s/[*_`]//g; s/^[[:space:]]*[-+>#]+[[:space:]]*//' |
-    awk 'NF && !/^```/ { print; if (++count == 3) exit }' |
-    paste -sd' ' - | oneline)"
-  removals="$(git diff --no-color --unified=0 "$prev" HEAD |
-    awk '/^--- / { next } /^-/ { print substr($0, 2) }' |
-    sed -E 's/\[([^]]+)\]\([^)]*\)/\1/g; s/[*_`]//g; s/^[[:space:]]*[-+>#]+[[:space:]]*//' |
-    awk 'NF && !/^```/ { print; if (++count == 3) exit }' |
-    paste -sd' ' - | oneline)"
-  if [ -n "$additions" ]; then
-    label="Updated content"
-    [ -z "$removals" ] && label="Added content"
-    content="$additions"
-  elif [ -n "$removals" ]; then
-    label="Removed content"
-    content="$removals"
-  else
-    echo "Content changed since the previous release."
-    return
-  fi
-  printf '%s: %s\n' "$label" "$content" | cut -c1-400
-}
-
-if [ -z "${GITHUB_TOKEN:-}" ]; then
-  fallback
+changed_files="$(git diff --name-only "$prev" HEAD)"
+if ! grep -Eq '^(README\.md|[0-9][0-9]_[^/]+\.md)$' <<<"$changed_files"; then
+  echo "Build and release automation updated."
   exit 0
 fi
 
-diff="$(git diff --no-color "$prev" HEAD | head -c "$max_diff_bytes")"
+preview_notice() {
+  case "${GITHUB_EVENT_NAME:-}" in
+    pull_request|workflow_dispatch)
+      echo "Preview build; release summary will be generated on main."
+      exit 0
+      ;;
+  esac
+}
+
+if [ -z "${GITHUB_TOKEN:-}" ]; then
+  preview_notice
+  echo "GitHub Models summary unavailable: GITHUB_TOKEN is not set." >&2
+  exit 1
+fi
+
+diff_size="$(git diff --no-color "$prev" HEAD | wc -c)"
+if [ "$diff_size" -gt "$max_diff_bytes" ]; then
+  preview_notice
+  echo "GitHub Models summary failed: diff exceeds the ${max_diff_bytes}-byte summary limit." >&2
+  exit 1
+fi
+diff="$(git diff --no-color "$prev" HEAD)"
 payload="$(jq -n --arg model "$model" --arg diff "$diff" '{
   model: $model,
   temperature: 0,
@@ -73,6 +68,7 @@ if reply="$(curl -fsS --max-time 60 \
     -d "$payload" | jq -er '.choices[0].message.content' | oneline)" && [ -n "$reply" ]; then
   echo "$reply"
 else
-  echo "Model summary unavailable; using changed content." >&2
-  fallback
+  preview_notice
+  echo "GitHub Models summary failed; refusing to publish a guide-content release without a semantic summary." >&2
+  exit 1
 fi
