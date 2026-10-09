@@ -20,13 +20,30 @@ Threat modeling is a form of risk assessment that asks how a system can be attac
 
 A trust boundary is a line where the level or assumption of trust changes—for example, between a user and an application, an application and external RAG content, or an LLM and a privileged tool. The attack surface is the set of reachable interfaces and behaviors through which an attacker can influence the system.
 
-user | application | LLM service
-
-^ trust changes here
-
-external content | RAG ingestion / vector index
-
-LLM tool request | privileged tool
+```mermaid
+flowchart TB
+    subgraph external["Untrusted: users and external content"]
+        user["user"]
+        content["external content"]
+    end
+    subgraph appzone["Application"]
+        app["application"]
+        ingest["RAG ingestion /<br/>vector index"]
+    end
+    subgraph modelzone["Model service"]
+        llm["LLM"]
+    end
+    subgraph privileged["Privileged"]
+        tool["privileged tool"]
+    end
+    user ==>|"request"| app
+    content ==>|"ingested data"| ingest
+    app ==>|"prompt and context"| llm
+    llm ==>|"tool request"| tool
+    classDef zone fill:#f8f8f8,stroke:#555,stroke-width:2px,stroke-dasharray:6 4
+    class external,appzone,modelzone,privileged zone
+    linkStyle 0,1,2,3 stroke:#c0392b,stroke-width:3px
+```
 
 ## Secure design principles
 
