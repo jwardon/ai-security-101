@@ -14,6 +14,8 @@ permissions:
   copilot-requests: write
 engine: copilot
 checkout: false
+features:
+  action-mode: release
 sandbox:
   agent: awf
 network:
