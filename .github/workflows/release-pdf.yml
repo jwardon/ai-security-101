@@ -78,7 +78,9 @@ jobs:
           PREV_TAG: ${{ steps.version.outputs.prev_tag }}
         run: |
           mkdir -p build
+          set -o pipefail
           scripts/summarize_diff.sh "$PREV_TAG" | tee build/release-notes.txt
+          test -s build/release-notes.txt
 
       - name: Resolve revision author
         id: author
