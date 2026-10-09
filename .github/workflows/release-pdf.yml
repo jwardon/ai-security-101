@@ -28,6 +28,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      # Let the author step read the pull request and the issues it closes.
+      pull-requests: read
+      issues: read
       # Lets the summary step call GitHub Models with GITHUB_TOKEN.
       models: read
     outputs:
@@ -43,6 +46,10 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends pandoc texlive-xetex texlive-latex-recommended texlive-fonts-recommended lmodern fonts-dejavu jq
+          # Mermaid diagrams are rendered with mermaid-cli, using the runner's preinstalled Chrome.
+          PUPPETEER_SKIP_DOWNLOAD=true npm install --prefix "$RUNNER_TEMP/mermaid" @mermaid-js/mermaid-cli@11.12.0
+          echo "MMDC=$RUNNER_TEMP/mermaid/node_modules/.bin/mmdc" >> "$GITHUB_ENV"
+          echo "MERMAID_CHROME=$(command -v google-chrome)" >> "$GITHUB_ENV"
 
       - name: Determine version and previous release
         id: version
@@ -73,12 +80,22 @@ jobs:
           mkdir -p build
           scripts/summarize_diff.sh "$PREV_TAG" | tee build/release-notes.txt
 
+      - name: Resolve revision author
+        id: author
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          scripts/resolve_author.sh "$GITHUB_SHA" "$PR_NUMBER" "$GITHUB_ACTOR" | tee build/author.txt
+          echo "author=$(cat build/author.txt)" >> "$GITHUB_OUTPUT"
+
       - name: Generate revision history
         env:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.version.outputs.version }}
+          AUTHOR: ${{ steps.author.outputs.author }}
         run: |
-          scripts/revisions_table.sh "$VERSION" "$(date -u +%F)" "$GITHUB_ACTOR" "$(cat build/release-notes.txt)" > build/revisions.md
+          scripts/revisions_table.sh "$VERSION" "$(date -u +%F)" "$AUTHOR" "$(cat build/release-notes.txt)" > build/revisions.md
 
       - name: Build PDF
         env:
@@ -100,6 +117,7 @@ jobs:
           path: |
             build/ai-security-101-*.pdf
             build/release-notes.txt
+            build/author.txt
           if-no-files-found: error
 
   publish:
@@ -122,9 +140,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ needs.build.outputs.version }}
         run: |
+          # Hidden marker so later revision tables credit the human, not the publishing bot.
+          { cat build/release-notes.txt; printf '\n\n<!-- author: %s -->\n' "$(cat build/author.txt)"; } > build/release-body.md
           gh release create "$VERSION" \
             "build/ai-security-101-${VERSION}.pdf" \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
             --title "AI Security 101 — $VERSION" \
-            --notes-file build/release-notes.txt
+            --notes-file build/release-body.md

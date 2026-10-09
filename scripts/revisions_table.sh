@@ -2,7 +2,9 @@
 # Print the Revisions table (date, author, summary) as Markdown.
 # Usage: scripts/revisions_table.sh <version> <date> <author> <summary>
 # The first row is the revision being built; the rest come from published
-# GitHub release metadata (requires GH_TOKEN and GITHUB_REPOSITORY).
+# GitHub release metadata (requires GH_TOKEN and GITHUB_REPOSITORY). A release's
+# author is the human recorded in its "<!-- author: login -->" notes marker, or
+# the release publisher if there is no marker.
 set -euo pipefail
 
 version="$1" date="$2" author="$3" summary="$4"
@@ -14,7 +16,11 @@ echo "| Date | Author | Summary |"
 echo "| ------------ | -------- | ------------------------------------------------------ |"
 printf '| %s | @%s | %s |\n' "$(label "$version" "$date")" "$author" "$(cell <<<"$summary")"
 gh api --paginate "repos/${GITHUB_REPOSITORY}/releases" \
-  --jq '.[] | select(.draft == false) | [.tag_name, .published_at[0:10], .author.login, (.body // "")] | @tsv' |
+  --jq '.[] | select(.draft == false)
+    | (.body // "") as $body
+    | [.tag_name, .published_at[0:10],
+       ($body | capture("<!-- author: (?<a>[A-Za-z0-9-]+) -->").a // null) // .author.login,
+       ($body | gsub("<!-- author: [A-Za-z0-9-]+ -->"; "") | gsub("\\s+"; " ") | gsub("^ | $"; ""))] | @tsv' |
   while IFS=$'\t' read -r tag rdate rauthor body; do
     printf '| %s | @%s | %s |\n' "$(label "$tag" "$rdate")" "$rauthor" "$(cell <<<"$body")"
   done

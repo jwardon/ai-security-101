@@ -38,9 +38,13 @@ combined="$out/ai-security-101.md"
   fi
 } > "$combined"
 
+# Mermaid diagrams are rendered by scripts/mermaid.lua. MMDC and MERMAID_CHROME can override the defaults.
+export MERMAID_OUT_DIR="$out/diagrams"
+
 pandoc "$combined" \
   --from markdown-smart-tex_math_dollars-raw_tex-yaml_metadata_block+autolink_bare_uris+pipe_tables \
   --pdf-engine=xelatex \
+  --lua-filter="$root/scripts/mermaid.lua" \
   --toc --toc-depth=2 \
   --metadata title="AI Security 101" \
   --metadata subtitle="Version $version" \

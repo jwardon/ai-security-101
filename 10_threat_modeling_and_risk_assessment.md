@@ -6,9 +6,9 @@ From that model, identify what can go wrong: which external or untrusted inputs 
 
 Finally, assess likelihood and impact and record residual risk—the risk that remains after controls have been applied. Threat models age. Architecture, data sources, models, tools, and controls change over time, so revisit the model as the system changes.
 
-```text
-data sourcing -> ingestion -> training -> evaluation -> artifact storage / distribution
-      -> deployment -> inference / RAG / agents -> monitoring / updates
+```mermaid
+flowchart LR
+    sourcing["data<br/>sourcing"] --> ingest["ingestion"] --> train["training"] --> eval["evaluation"] --> store["artifact<br/>storage /<br/>distribution"] --> deploy["deployment"] --> infer["inference /<br/>RAG /<br/>agents"] --> mon["monitoring /<br/>updates"]
 ```
 
 ## Frameworks that help

@@ -24,14 +24,14 @@ The context window is the finite amount of information available to the model fo
 
 Retrieval-Augmented Generation (RAG) gives an LLM access to external knowledge at inference time instead of relying only on information learned into its weights. A retrieval system searches a knowledge source for material relevant to a query and supplies selected content for the application to include in the LLM context.
 
-```text
-RAG INGESTION
-documents -> split into chunks -> embedding model -> vector index
+```mermaid
+flowchart LR
+    docs["documents"] --> chunk["split into<br/>chunks"] --> embed["embedding<br/>model"] --> index[("vector<br/>index")]
 ```
 
-```text
-RAG QUERY
-user query -> embedding/search -> top-k matching chunks -> LLM context -> LLM -> response
+```mermaid
+flowchart LR
+    query["user query"] --> search["embedding<br/>and search"] --> topk["top-k matching<br/>chunks"] --> ctx["LLM<br/>context"] --> llm["LLM"] --> resp["response"]
 ```
 
 Top-k means the retrieval system returns the k highest-ranked matches—for example, the five most similar chunks when k=5. A document does not need to rank first to influence the model; it only needs to make the returned set. Section 6 returns to this point when discussing RAG corpus poisoning.
@@ -57,10 +57,13 @@ AI applications often use smaller classifiers around a larger LLM because they c
 
 An agentic AI system allows a model to do more than return text. The application exposes tools—such as search, email, files, databases, APIs, or code execution—and the model can propose which tool to call and with what arguments. Application code then decides whether to execute the action and may return the result to the model for another step.
 
-```text
-user -> application -> LLM -> proposed tool call -> application -> tool
-  ^                                                  |
-  +-------------------- tool result -----------------+
+```mermaid
+flowchart LR
+    user["user"] --> app["application"]
+    app --> llm["LLM"]
+    llm -->|"proposed<br/>tool call"| app
+    app -->|"approved<br/>call"| tool["tool"]
+    tool -->|"tool result"| app
 ```
 
 Tool use turns model output into actions with real consequences. This is where "the model said something weird" can become "the model did something weird." Section 8 covers the controls that should sit between a model proposal and actual authority.
@@ -81,18 +84,27 @@ Section 8 returns to this baseline for behavioral testing. Run baseline tests af
 
 Training, RAG ingestion, and inference are distinct processes that meet at runtime. Training produces the model that an inference service later loads or serves. RAG ingestion prepares an external knowledge source that can be searched at inference time.
 
-```text
-TRAINING
-corpus -> training code/config -> training -> MODEL ARTIFACT ----------------+
-                                      |                                      | loaded / served
-                                      +-> evaluation baseline                v
-RAG INGESTION                                               inference service / LLM
-documents -> chunk/embed -> VECTOR INDEX ----------------+            ^        |
-                                                        |            |        +-> response
-                                                        v            |
-INFERENCE user -> application -> RAG query -> VECTOR INDEX -> top-k chunks ---+
-                   |
-                   +<-> agent tools
+```mermaid
+flowchart TB
+    subgraph training["TRAINING"]
+        corpus["corpus"] --> trainer["training code/config<br/>and training"]
+        trainer --> model["MODEL ARTIFACT"]
+        trainer --> baseline["evaluation<br/>baseline"]
+    end
+    subgraph ingestion["RAG INGESTION"]
+        docs["documents"] --> embed["chunk and embed"]
+        embed --> index[("VECTOR INDEX")]
+    end
+    subgraph inference["INFERENCE"]
+        user["user"] --> app["application"]
+        app --> rag["RAG query"]
+        app <--> tools["agent tools"]
+        rag --> topk["top-k chunks"]
+        topk --> llm["inference service / LLM"]
+        llm --> resp["response"]
+    end
+    model -->|"loaded / served"| llm
+    index --> rag
 ```
 
 ### Artifacts across the lifecycle
