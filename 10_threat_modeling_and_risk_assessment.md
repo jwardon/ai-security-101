@@ -35,7 +35,7 @@ A document assistant summarizes incoming vendor emails and can search internal f
 
 - **STRIDE** highlights **Information Disclosure** if confidential data reaches the attacker, and potentially **Elevation of Privilege** if the assistant uses its broader tool permissions on the sender's behalf. It frames the impact and trust-boundary concerns, not the AI-specific attack technique.
 - **MITRE ATLAS** maps the attack to the [Execution tactic (AML.TA0005)](https://atlas.mitre.org/tactics/AML.TA0005) → [LLM Prompt Injection technique (AML.T0051)](https://atlas.mitre.org/techniques/AML.T0051): the attacker embeds instructions in an email the assistant ingests, fitting the technique, and intends the assistant to act on those instructions, fitting the tactic. This mapping can inform threat-driven tests.
-- **OWASP** classifies the scenario under [Prompt Injection and Excessive Agency](https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/): the manipulated input and the risk of granting an AI application overly broad tool permissions or autonomy.
+- **OWASP** maps the scenario to [LLM01:2026 Prompt Injection](https://github.com/GenAI-Security-Project/GenAI-LLM-Top10/blob/main/2026/final/LLM01_PromptInjection.md) because the email contains instructions intended to alter the assistant's behavior, and [LLM03:2026 Excessive Agency](https://github.com/GenAI-Security-Project/GenAI-LLM-Top10/blob/main/2026/final/LLM03_ExcessiveAgency.md) because the assistant's broad tool access could let it retrieve and transmit data without appropriate controls.
 
 ## Risk assessment
 
