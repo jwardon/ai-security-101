@@ -14,12 +14,11 @@ flowchart LR
         artifact["model<br/>artifact"] --> load["deserialize<br/>/ load"] --> inference["inference"]
         runtime --> inference
     end
-    load -.- s1["Serialization:<br/>behavior during<br/>reconstruction"]
     artifact -.- s2["Architecture / custom code:<br/>executable model logic"]
     artifact -.- s3["Weights + adapters:<br/>learned behavior"]
 ```
 
-Different attack surfaces can coexist in one deployment. Dependencies affect the code around the model; serialization affects how an artifact is reconstructed; architecture or custom code can add executable behavior; and weights or adapters can alter learned behavior.
+Different attack surfaces can coexist in one deployment. Dependencies affect the code around the model; deserialization affects what happens when an artifact is loaded; architecture or custom code can add executable behavior; and weights or adapters can alter learned behavior.
 
 ## Unsafe serialization
 
