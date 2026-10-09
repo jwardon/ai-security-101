@@ -39,15 +39,19 @@ Diagrams in the guide are Mermaid code blocks. GitHub renders them natively in M
 
 ## Release summary
 
-The release notes, and the matching Revisions row, are a one-sentence summary of the diff between the previous release's tag and the commit being built. Pull-request preview PDFs include this prospective revision row using the same summary as a release. Commit messages and PR titles are not used.
+The release notes, and the matching Revisions row, summarize the change since the previous release. Pull-request preview PDFs include this prospective revision row using the same summary as a release. Commit messages and PR titles are not used.
 
-For a release containing guide-content changes, the deterministic summary is "AI security guide content updated." No external model service or additional token permissions are required. The workflow also publishes releases for build or automation-only changes, which are labeled "Build and release automation updated." The first release is summarized as "Initial release."
+When guide content changes, the deterministic workflow prepares a diff of the changed guide Markdown and enforces a 60 KB limit before passing it to a dedicated GitHub Agentic Workflow using Copilot. The agent has no repository checkout, GitHub read tools, shell access, PDF tools, or release permissions. It runs in the default Agent Workflow Firewall sandbox with only the capabilities needed to read the supplied diff and return a candidate summary artifact. The diff is untrusted data, and the agent is instructed not to follow instructions inside it.
+
+The summary artifact is untrusted model output. Before using it in release notes or the Revisions table, deterministic validation requires a nonempty, single sentence of at most 40 words and rejects generic summaries such as "AI security guide content updated." Invalid output or an agent failure fails the build; there is no low-quality fallback. Pull-request builds use the same diff preparation, summarization, and validation path as builds on `main`, so they fail on the same conditions.
+
+Build or automation-only changes use the deterministic summary "Build and release automation updated." The first release uses "Initial release." No semantic-summary agent is run for either case.
 
 Pull-request PDF artifacts are clearly marked as previews: the text `- PREVIEW` is appended to the document title, and `-PREVIEW` is appended to the PDF filename. The title uses the existing Pandoc title treatment. Preview status is not added to the Revisions table; its summary remains about the actual content change.
 
 ## Repository configuration
 
-- Actions must be enabled. The workflow requests `contents: read` for the build job, and `contents: write` only for the publish job. The build job also requests `pull-requests: read` and `issues: read` to resolve the revision author.
+- Actions and GitHub Agentic Workflows with Copilot must be enabled for the repository or its organization. The summarization agent receives only `copilot-requests: write`; it has no repository content or release permissions. Its isolated safe-output job can upload only the one temporary summary artifact. The PDF build job requests `contents: read` and the permissions required to resolve revision authors, while `contents: write` is limited to the publish job.
 - To keep releases immutable, enable **Settings → General → Releases → Enable release immutability**. Changes should then be published as a new release.
 - Third-party actions are pinned to commit SHAs. Update the pins deliberately, for example with Dependabot.
 - The PDF build installs `pandoc` and TeX packages from the runner's Ubuntu package repositories, so output can vary slightly over time. A separately maintained, versioned build container with pinned dependencies is planned as follow-up work.

@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-# Print a one-line summary of the diff between a previous release and HEAD.
-# Usage: scripts/summarize_diff.sh <previous-ref>
-# Summaries are deterministic so release builds do not depend on an external model.
+# Prepare the content diff or a deterministic summary since the previous release.
+# Usage: scripts/summarize_diff.sh <previous-ref> <content-diff-output>
 set -euo pipefail
 
 prev="${1:-}"
+diff_output="${2:-}"
+max_diff_bytes=60000
 
 if [ -z "$prev" ]; then
   echo "Initial release."
@@ -22,4 +23,16 @@ if ! grep -Eq '^(README\.md|[0-9][0-9]_[^/]+\.md)$' <<<"$changed_files"; then
   exit 0
 fi
 
-echo "AI security guide content updated."
+if [ -z "$diff_output" ]; then
+  echo "A content diff output path is required for semantic summaries." >&2
+  exit 1
+fi
+
+git diff --no-color "$prev" HEAD -- README.md ':(glob)[0-9][0-9]_*.md' > "$diff_output"
+diff_size="$(wc -c < "$diff_output")"
+if [ "$diff_size" -gt "$max_diff_bytes" ]; then
+  echo "Guide-content diff exceeds the ${max_diff_bytes}-byte semantic summary limit." >&2
+  exit 1
+fi
+
+echo "SEMANTIC_SUMMARY_REQUIRED"

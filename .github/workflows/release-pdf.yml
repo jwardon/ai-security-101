@@ -6,6 +6,8 @@ on:
       - "*.md"
       - "scripts/**"
       - ".github/workflows/release-pdf.yml"
+      - ".github/workflows/release-summary.md"
+      - ".github/workflows/release-summary.lock.yml"
   push:
     branches:
       - main
@@ -14,6 +16,8 @@ on:
       - "[0-9][0-9]_*.md"
       - "scripts/**"
       - ".github/workflows/release-pdf.yml"
+      - ".github/workflows/release-summary.md"
+      - ".github/workflows/release-summary.lock.yml"
   workflow_dispatch:
 
 permissions: {}
@@ -23,31 +27,26 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
-    name: Build PDF
+  prepare:
+    name: Prepare release inputs
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      # Let the author step read the pull request and the issues it closes.
       pull-requests: read
       issues: read
     outputs:
       version: ${{ steps.version.outputs.version }}
+      prev_tag: ${{ steps.version.outputs.prev_tag }}
+      summary: ${{ steps.summary.outputs.summary }}
+      summary_mode: ${{ steps.summary.outputs.summary_mode }}
+      guide_diff: ${{ steps.summary.outputs.guide_diff }}
+      author: ${{ steps.author.outputs.author }}
 
     steps:
       - name: Check out repository
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           fetch-depth: 0
-
-      - name: Install build tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends pandoc texlive-xetex texlive-latex-recommended texlive-fonts-recommended lmodern fonts-dejavu jq
-          # Mermaid diagrams are rendered with mermaid-cli, using the runner's preinstalled Chrome.
-          PUPPETEER_SKIP_DOWNLOAD=true npm install --prefix "$RUNNER_TEMP/mermaid" @mermaid-js/mermaid-cli@11.12.0
-          echo "MMDC=$RUNNER_TEMP/mermaid/node_modules/.bin/mmdc" >> "$GITHUB_ENV"
-          echo "MERMAID_CHROME=$(command -v google-chrome)" >> "$GITHUB_ENV"
 
       - name: Determine version and previous release
         id: version
@@ -69,15 +68,29 @@ jobs:
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "prev_tag=$prev_tag" >> "$GITHUB_OUTPUT"
 
-      - name: Summarize changes since previous release
+      - name: Prepare release summary input
         id: summary
         env:
           PREV_TAG: ${{ steps.version.outputs.prev_tag }}
         run: |
           mkdir -p build
-          set -o pipefail
-          scripts/summarize_diff.sh "$PREV_TAG" | tee build/release-notes.txt
-          test -s build/release-notes.txt
+          summary="$(scripts/summarize_diff.sh "$PREV_TAG" build/guide-content.diff)"
+          if [ "$summary" = "SEMANTIC_SUMMARY_REQUIRED" ]; then
+            delimiter="ghaw_$(cat /proc/sys/kernel/random/uuid)"
+            while grep -Fqx "$delimiter" build/guide-content.diff; do
+              delimiter="ghaw_$(cat /proc/sys/kernel/random/uuid)"
+            done
+            {
+              echo "guide_diff<<$delimiter"
+              cat build/guide-content.diff
+              echo "$delimiter"
+            } >> "$GITHUB_OUTPUT"
+            echo "summary_mode=semantic" >> "$GITHUB_OUTPUT"
+          else
+            test -n "$summary"
+            echo "summary_mode=deterministic" >> "$GITHUB_OUTPUT"
+            echo "summary=$summary" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Resolve revision author
         id: author
@@ -88,17 +101,78 @@ jobs:
           scripts/resolve_author.sh "$GITHUB_SHA" "$PR_NUMBER" "$GITHUB_ACTOR" | tee build/author.txt
           echo "author=$(cat build/author.txt)" >> "$GITHUB_OUTPUT"
 
+  semantic-summary:
+    name: Generate semantic release summary
+    needs: prepare
+    if: needs.prepare.outputs.summary_mode == 'semantic'
+    uses: ./.github/workflows/release-summary.lock.yml
+    with:
+      guide_diff: ${{ needs.prepare.outputs.guide_diff }}
+    permissions:
+      contents: none
+      actions: read
+      copilot-requests: write
+
+  build:
+    name: Build PDF
+    needs: [prepare, semantic-summary]
+    if: >-
+      always() &&
+      needs.prepare.result == 'success' &&
+      (needs.semantic-summary.result == 'success' ||
+      (needs.prepare.outputs.summary_mode != 'semantic' && needs.semantic-summary.result == 'skipped'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ needs.prepare.outputs.version }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 1
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends pandoc texlive-xetex texlive-latex-recommended texlive-fonts-recommended lmodern fonts-dejavu jq
+          # Mermaid diagrams are rendered with mermaid-cli, using the runner's preinstalled Chrome.
+          PUPPETEER_SKIP_DOWNLOAD=true npm install --prefix "$RUNNER_TEMP/mermaid" @mermaid-js/mermaid-cli@11.12.0
+          echo "MMDC=$RUNNER_TEMP/mermaid/node_modules/.bin/mmdc" >> "$GITHUB_ENV"
+          echo "MERMAID_CHROME=$(command -v google-chrome)" >> "$GITHUB_ENV"
+
+      - name: Download semantic summary
+        if: needs.prepare.outputs.summary_mode == 'semantic'
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: release-summary
+          path: build/semantic-summary
+
+      - name: Validate and select release summary
+        env:
+          SUMMARY_MODE: ${{ needs.prepare.outputs.summary_mode }}
+          DETERMINISTIC_SUMMARY: ${{ needs.prepare.outputs.summary }}
+        run: |
+          mkdir -p build
+          if [ "$SUMMARY_MODE" = "semantic" ]; then
+            scripts/validate_release_summary.sh build/semantic-summary/release-summary.txt > build/release-notes.txt
+          else
+            printf '%s\n' "$DETERMINISTIC_SUMMARY" > build/release-notes.txt
+          fi
+          test -s build/release-notes.txt
+
       - name: Generate revision history
         env:
           GH_TOKEN: ${{ github.token }}
-          VERSION: ${{ steps.version.outputs.version }}
-          AUTHOR: ${{ steps.author.outputs.author }}
+          VERSION: ${{ needs.prepare.outputs.version }}
+          AUTHOR: ${{ needs.prepare.outputs.author }}
         run: |
           scripts/revisions_table.sh "$VERSION" "$(date -u +%F)" "$AUTHOR" "$(cat build/release-notes.txt)" > build/revisions.md
 
       - name: Build PDF
         env:
-          VERSION: ${{ steps.version.outputs.version }}
+          VERSION: ${{ needs.prepare.outputs.version }}
           PREVIEW: ${{ github.event_name == 'pull_request' }}
         run: |
           preview=""
@@ -107,7 +181,7 @@ jobs:
 
       - name: Validate PDF
         env:
-          VERSION: ${{ steps.version.outputs.version }}
+          VERSION: ${{ needs.prepare.outputs.version }}
           PREVIEW: ${{ github.event_name == 'pull_request' }}
         run: |
           suffix=""
