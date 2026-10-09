@@ -25,6 +25,7 @@ Enumeration is product-specific. For example, a tester might query a model serve
 
 Small disclosures become bigger problems when they connect components. A notebook may reveal an internal MLflow URL or credential; MLflow may reveal an object-storage location; that storage may contain a model artifact.
 
-```text
-Jupyter -> credential / internal endpoint -> MLflow -> artifact location -> object storage -> model artifact
+```mermaid
+flowchart LR
+    jupyter["Jupyter"] --> cred["credential /<br/>internal<br/>endpoint"] --> mlflow["MLflow"] --> loc["artifact<br/>location"] --> store["object<br/>storage"] --> artifact["model<br/>artifact"]
 ```

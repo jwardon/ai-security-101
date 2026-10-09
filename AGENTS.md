@@ -29,6 +29,11 @@ The repository's Markdown files are the canonical source for the guide.
 - Do not elevate speculative, narrowly demonstrated, or minor techniques into major attack categories without strong justification.
 - Clearly distinguish established guidance from emerging research or uncertain claims.
 
+## Markdown Formatting
+
+- Do not hard-wrap Markdown prose. Keep each paragraph on a single source line.
+- Code blocks, YAML, and shell may be wrapped where useful.
+
 ## Writing Style
 
 Match the existing voice of the guide:

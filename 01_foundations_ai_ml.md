@@ -24,14 +24,16 @@ The context window is the finite amount of information available to the model fo
 
 Retrieval-Augmented Generation (RAG) gives an LLM access to external knowledge at inference time instead of relying only on information learned into its weights. A retrieval system searches a knowledge source for material relevant to a query and supplies selected content for the application to include in the LLM context.
 
-```text
-RAG INGESTION
-documents -> split into chunks -> embedding model -> vector index
-```
-
-```text
-RAG QUERY
-user query -> embedding/search -> top-k matching chunks -> LLM context -> LLM -> response
+```mermaid
+flowchart TB
+    subgraph ingestion["RAG ingestion (indexing)"]
+        direction TB
+        docs["documents"] --> chunk["split into chunks"] --> embed["embedding model"] --> index[("vector index")]
+    end
+    subgraph retrieval["RAG retrieval (at inference time)"]
+        direction TB
+        query["user query"] --> search["embed and search"] --> topk["top-k chunks"] --> ctx["LLM context"] --> llm["LLM"] --> resp["response"]
+    end
 ```
 
 Top-k means the retrieval system returns the k highest-ranked matches—for example, the five most similar chunks when k=5. A document does not need to rank first to influence the model; it only needs to make the returned set. Section 6 returns to this point when discussing RAG corpus poisoning.
@@ -46,9 +48,17 @@ Long documents are usually divided into chunks before embedding. A chunk is much
 
 A classifier is a model that assigns an input to one or more categories, often with confidence scores. Examples include spam detection, malware classification, image classification, and AI-security classifiers that look for prompt injection, unsafe content, or sensitive information.
 
-```text
-user input -> input classifier -> application -> LLM
-LLM output -> output classifier -> application -> response
+```mermaid
+flowchart TB
+    subgraph input["Input classification"]
+        direction LR
+        in1["user input"] --> inc["input classifier"] --> app1["application"] --> llm1["LLM"]
+    end
+    subgraph output["Output classification"]
+        direction LR
+        llm2["LLM output"] --> outc["output classifier"] --> app2["application"] --> resp["response"]
+    end
+    input ~~~ output
 ```
 
 AI applications often use smaller classifiers around a larger LLM because they can run faster and at lower cost. Useful? Absolutely. Infallible? No. Classification boundaries can be uncertain, inputs can fall outside the detector's training distribution, and attackers can deliberately search for evasive inputs. Section 8 covers classifiers as guardrails; Section 9 covers bypass techniques.
@@ -57,10 +67,22 @@ AI applications often use smaller classifiers around a larger LLM because they c
 
 An agentic AI system allows a model to do more than return text. The application exposes tools—such as search, email, files, databases, APIs, or code execution—and the model can propose which tool to call and with what arguments. Application code then decides whether to execute the action and may return the result to the model for another step.
 
-```text
-user -> application -> LLM -> proposed tool call -> application -> tool
-  ^                                                  |
-  +-------------------- tool result -----------------+
+```mermaid
+sequenceDiagram
+    actor U as User
+    participant A as Application
+    participant M as LLM
+    participant T as Tool
+    U->>A: request
+    A->>M: context
+    M-->>A: proposed tool call
+    Note over A: authorized / approved?
+    alt approved
+        A->>T: invoke tool
+        T-->>A: tool result
+        A->>M: tool result
+    end
+    A-->>U: response
 ```
 
 Tool use turns model output into actions with real consequences. This is where "the model said something weird" can become "the model did something weird." Section 8 covers the controls that should sit between a model proposal and actual authority.
@@ -81,18 +103,27 @@ Section 8 returns to this baseline for behavioral testing. Run baseline tests af
 
 Training, RAG ingestion, and inference are distinct processes that meet at runtime. Training produces the model that an inference service later loads or serves. RAG ingestion prepares an external knowledge source that can be searched at inference time.
 
-```text
-TRAINING
-corpus -> training code/config -> training -> MODEL ARTIFACT ----------------+
-                                      |                                      | loaded / served
-                                      +-> evaluation baseline                v
-RAG INGESTION                                               inference service / LLM
-documents -> chunk/embed -> VECTOR INDEX ----------------+            ^        |
-                                                        |            |        +-> response
-                                                        v            |
-INFERENCE user -> application -> RAG query -> VECTOR INDEX -> top-k chunks ---+
-                   |
-                   +<-> agent tools
+```mermaid
+flowchart TB
+    subgraph training["TRAINING"]
+        corpus["corpus"] --> trainer["training code,<br/>config, training"]
+        trainer --> model["MODEL<br/>ARTIFACT"]
+        trainer --> baseline["evaluation<br/>baseline"]
+    end
+    subgraph ingestion["RAG INGESTION"]
+        docs["documents"] --> embed["chunk and<br/>embed"]
+        embed --> index[("VECTOR<br/>INDEX")]
+    end
+    subgraph inference["INFERENCE"]
+        user["user"] --> app["application"]
+        app --> rag["RAG query"]
+        app <--> tools["agent<br/>tools"]
+        rag --> topk["top-k<br/>chunks"]
+        topk --> llm["inference<br/>service / LLM"]
+        llm --> resp["response"]
+    end
+    model -->|"loaded / served"| llm
+    index --> rag
 ```
 
 ### Artifacts across the lifecycle
