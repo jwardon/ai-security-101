@@ -18,15 +18,15 @@ flowchart LR
 No single framework covers every part of AI security. These three are useful for different purposes:
 
 - **[STRIDE](https://learn.microsoft.com/en-us/azure/security/develop/threat-modeling-tool-threats) - broad system threat categories.** STRIDE is an acronym for:
-  - **S — Spoofing:** pretending to be another identity.
-  - **T — Tampering:** unauthorized modification.
-  - **R — Repudiation:** actions that cannot be reliably attributed or proven.
-  - **I — Information Disclosure:** unauthorized exposure.
-  - **D — Denial of Service:** making a resource unavailable.
-  - **E — Elevation of Privilege:** gaining permissions beyond those intended.
+  - **Spoofing:** pretending to be another identity.
+  - **Tampering:** unauthorized modification.
+  - **Repudiation:** actions that cannot be reliably attributed or proven.
+  - **Information Disclosure:** unauthorized exposure.
+  - **Denial of Service:** making a resource unavailable.
+  - **Elevation of Privilege:** gaining permissions beyond those intended.
   It is useful for systematically reviewing components, data flows, and trust boundaries.
-- **[MITRE ATLAS](https://atlas.mitre.org/) - adversary behavior against AI-enabled systems.** ATLAS stands for Adversarial Threat Landscape for Artificial Intelligence Systems. It is a living knowledge base of AI-focused adversary tactics and techniques: tactics describe adversary goals, while techniques describe methods used to achieve them. Use it when asking how a real attacker might achieve an objective against models, data, or AI-enabled applications, and when planning threat-informed testing or red-team scenarios.
-- **[OWASP GenAI / LLM guidance](https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/) - recurring application risks and mitigations.** OWASP organizes common implementation risks such as prompt injection, sensitive-information disclosure, supply-chain weaknesses, and excessive agency. It is useful as an application-security checklist and mitigation reference, especially for generative-AI systems.
+- **[MITRE ATLAS](https://atlas.mitre.org/) - Adversarial Threat Landscape for Artificial Intelligence Systems.** It is a living knowledge base of AI-focused adversary tactics and techniques: tactics describe adversary goals, while techniques describe methods used to achieve them. Use it when asking how a real attacker might achieve an objective against models, data, or AI-enabled applications, and when planning threat-informed testing or red-team scenarios.
+- **[OWASP Top 10 for LLM Applications 2026](https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/) - recurring application risks and mitigations.** OWASP organizes common implementation risks such as prompt injection, sensitive-information disclosure, supply-chain weaknesses, and excessive agency. It is useful as an application-security checklist and mitigation reference, especially for generative-AI systems.
 They overlap but are not interchangeable. STRIDE helps find broad threat classes in your architecture; ATLAS adds concrete AI adversary behaviors and attack paths; OWASP helps check common GenAI implementation risks and practical mitigations. A reasonable review may use one, two, or all three depending on scope—there is no industry requirement to run them in a fixed sequence.
 
 ### Example: indirect prompt injection in a document assistant
@@ -34,7 +34,7 @@ They overlap but are not interchangeable. STRIDE helps find broad threat classes
 A document assistant summarizes incoming vendor emails and can search internal files and draft replies. An attacker sends an email containing instructions to ignore the summary task, retrieve confidential pricing, and send it to an external address.
 
 - **STRIDE** highlights **Information Disclosure** if confidential data reaches the attacker, and potentially **Elevation of Privilege** if the assistant uses its broader tool permissions on the sender's behalf. It frames the impact and trust-boundary concerns, not the AI-specific attack technique.
-- **MITRE ATLAS** maps the attack to the [Execution tactic (AML.TA0005)](https://atlas.mitre.org/tactics/AML.TA0005) → [LLM Prompt Injection technique (AML.T0051)](https://atlas.mitre.org/techniques/AML.T0051), a concrete adversary behavior that can inform threat-driven tests.
+- **MITRE ATLAS** maps the attack to the [Execution tactic (AML.TA0005)](https://atlas.mitre.org/tactics/AML.TA0005) → [LLM Prompt Injection technique (AML.T0051)](https://atlas.mitre.org/techniques/AML.T0051): the attacker embeds instructions in an email the assistant ingests, fitting the technique, and intends the assistant to act on those instructions, fitting the tactic. This mapping can inform threat-driven tests.
 - **OWASP** classifies the scenario under [Prompt Injection and Excessive Agency](https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/): the manipulated input and the risk of granting an AI application overly broad tool permissions or autonomy.
 
 ## Risk assessment
