@@ -31,8 +31,6 @@ jobs:
       # Let the author step read the pull request and the issues it closes.
       pull-requests: read
       issues: read
-      # Lets the summary step call GitHub Models with GITHUB_TOKEN.
-      models: read
     outputs:
       version: ${{ steps.version.outputs.version }}
 
@@ -74,7 +72,6 @@ jobs:
       - name: Summarize changes since previous release
         id: summary
         env:
-          GITHUB_TOKEN: ${{ github.token }}
           PREV_TAG: ${{ steps.version.outputs.prev_tag }}
         run: |
           mkdir -p build
