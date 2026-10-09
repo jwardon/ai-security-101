@@ -7,12 +7,9 @@ From that model, identify what can go wrong: which external or untrusted inputs 
 Finally, assess likelihood and impact and record residual risk—the risk that remains after controls have been applied. Threat models age. Architecture, data sources, models, tools, and controls change over time, so revisit the model as the system changes.
 
 ```mermaid
-flowchart TB
-    map["1. Map the system and<br/>trust boundaries"] --> threats["2. Identify threats"]
-    threats --> controls["3. Map and evaluate<br/>controls"]
-    controls --> assess["4. Assess likelihood<br/>and impact"]
-    assess --> residual["5. Record residual risk"]
-    residual --> revisit["6. Revisit as the<br/>system changes"]
+flowchart LR
+    map["1. Map system and<br/>trust boundaries"] --> threats["2. Identify<br/>threats"] --> controls["3. Map and evaluate<br/>controls"]
+    controls --> assess["4. Assess likelihood<br/>and impact"] --> residual["5. Record<br/>residual risk"] --> revisit["6. Revisit as system<br/>changes"]
     revisit -. "repeat" .-> map
 ```
 

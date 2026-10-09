@@ -24,7 +24,7 @@ display() {
 cell() { tr '\r\n\t' '   ' | sed 's/  */ /g; s/^ //; s/ $//; s/|/\\|/g'; }
 
 echo "| Date | Author | Summary |"
-echo "| ------------ | -------- | ------------------------------------------------------ |"
+echo "| ---------------- | ------------------------ | ------------------------------------------ |"
 printf '| %s | %s | %s |\n' "$(label "$version" "$date")" "$(display "$author" | cell)" "$(cell <<<"$summary")"
 gh api --paginate "repos/${GITHUB_REPOSITORY}/releases" \
   --jq '.[] | select(.draft == false)

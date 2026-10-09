@@ -6,15 +6,18 @@ An AI system depends on more than its final model file. It also depends on train
 
 A suspicious model artifact can carry risk in several different forms, and each form requires different analysis and controls:
 
-> MODEL / SERVING SUPPLY CHAIN
-
-package dependencies ------------------------------> runtime / serving code
-                                                         |
-model artifact --> deserialize / load -----------------> inference
-      |
-      |-- serialization: behavior during reconstruction
-      |-- architecture / custom code: executable model logic
-      `-- weights + adapters: learned behavior
+```mermaid
+flowchart LR
+    subgraph chain["Model / serving supply chain"]
+        direction LR
+        deps["package<br/>dependencies"] --> runtime["runtime /<br/>serving code"]
+        artifact["model<br/>artifact"] --> load["deserialize<br/>/ load"] --> inference["inference"]
+        runtime --> inference
+    end
+    load -.- s1["Serialization:<br/>behavior during<br/>reconstruction"]
+    artifact -.- s2["Architecture / custom code:<br/>executable model logic"]
+    artifact -.- s3["Weights + adapters:<br/>learned behavior"]
+```
 
 Different attack surfaces can coexist in one deployment. Dependencies affect the code around the model; serialization affects how an artifact is reconstructed; architecture or custom code can add executable behavior; and weights or adapters can alter learned behavior.
 

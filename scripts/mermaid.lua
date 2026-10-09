@@ -46,5 +46,9 @@ function CodeBlock(block)
   f:close()
   local px = string.unpack(">I4", header, 17)
   local width = string.format("%.3fin", math.min(px / scale / 96, 6.5))
-  return pandoc.Para({ pandoc.Image({}, name .. ".png", "", pandoc.Attr("", {}, { width = width })) })
+  return {
+    pandoc.RawBlock("latex", "\\begin{center}"),
+    pandoc.Para({ pandoc.Image({}, name .. ".png", "", pandoc.Attr("", {}, { width = width })) }),
+    pandoc.RawBlock("latex", "\\end{center}"),
+  }
 end

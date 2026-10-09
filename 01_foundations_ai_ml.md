@@ -49,19 +49,16 @@ Long documents are usually divided into chunks before embedding. A chunk is much
 A classifier is a model that assigns an input to one or more categories, often with confidence scores. Examples include spam detection, malware classification, image classification, and AI-security classifiers that look for prompt injection, unsafe content, or sensitive information.
 
 ```mermaid
-flowchart LR
+flowchart TB
     subgraph input["Input classification"]
         direction LR
-        in1["user<br/>input"] --> inc["input<br/>classifier"] --> app1["application"] --> llm1["LLM"]
+        in1["user input"] --> inc["input classifier"] --> app1["application"] --> llm1["LLM"]
     end
-```
-
-```mermaid
-flowchart LR
     subgraph output["Output classification"]
         direction LR
-        llm2["LLM<br/>output"] --> outc["output<br/>classifier"] --> app2["application"] --> resp["response"]
+        llm2["LLM output"] --> outc["output classifier"] --> app2["application"] --> resp["response"]
     end
+    input ~~~ output
 ```
 
 AI applications often use smaller classifiers around a larger LLM because they can run faster and at lower cost. Useful? Absolutely. Infallible? No. Classification boundaries can be uncertain, inputs can fall outside the detector's training distribution, and attackers can deliberately search for evasive inputs. Section 8 covers classifiers as guardrails; Section 9 covers bypass techniques.
