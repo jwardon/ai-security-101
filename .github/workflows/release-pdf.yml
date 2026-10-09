@@ -109,7 +109,7 @@ jobs:
     with:
       guide_diff: ${{ needs.prepare.outputs.guide_diff }}
     permissions:
-      contents: none
+      contents: read
       actions: read
       copilot-requests: write
 
