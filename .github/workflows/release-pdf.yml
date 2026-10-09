@@ -100,13 +100,20 @@ jobs:
       - name: Build PDF
         env:
           VERSION: ${{ steps.version.outputs.version }}
-        run: scripts/build_pdf.sh "$VERSION" build/revisions.md
+          PREVIEW: ${{ github.event_name == 'pull_request' }}
+        run: |
+          preview=""
+          if [ "$PREVIEW" = "true" ]; then preview="preview"; fi
+          scripts/build_pdf.sh "$VERSION" build/revisions.md "$preview"
 
       - name: Validate PDF
         env:
           VERSION: ${{ steps.version.outputs.version }}
+          PREVIEW: ${{ github.event_name == 'pull_request' }}
         run: |
-          pdf="build/ai-security-101-${VERSION}.pdf"
+          suffix=""
+          if [ "$PREVIEW" = "true" ]; then suffix="-PREVIEW"; fi
+          pdf="build/ai-security-101-${VERSION}${suffix}.pdf"
           test -s "$pdf"
           head -c 5 "$pdf" | grep -q '^%PDF-'
 

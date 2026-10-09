@@ -27,24 +27,13 @@ if ! grep -Eq '^(README\.md|[0-9][0-9]_[^/]+\.md)$' <<<"$changed_files"; then
   exit 0
 fi
 
-preview_notice() {
-  case "${GITHUB_EVENT_NAME:-}" in
-    pull_request|workflow_dispatch)
-      echo "Preview build; release summary will be generated on main."
-      exit 0
-      ;;
-  esac
-}
-
 if [ -z "${GITHUB_TOKEN:-}" ]; then
-  preview_notice
   echo "GitHub Models summary unavailable: GITHUB_TOKEN is not set." >&2
   exit 1
 fi
 
 diff_size="$(git diff --no-color "$prev" HEAD | wc -c)"
 if [ "$diff_size" -gt "$max_diff_bytes" ]; then
-  preview_notice
   echo "GitHub Models summary failed: diff exceeds the ${max_diff_bytes}-byte summary limit." >&2
   exit 1
 fi
@@ -68,7 +57,6 @@ if reply="$(curl -fsS --max-time 60 \
     -d "$payload" | jq -er '.choices[0].message.content' | oneline)" && [ -n "$reply" ]; then
   echo "$reply"
 else
-  preview_notice
   echo "GitHub Models summary failed; refusing to publish a guide-content release without a semantic summary." >&2
   exit 1
 fi
