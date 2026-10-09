@@ -48,15 +48,22 @@ payload="$(jq -n --arg model "$model" --arg diff "$diff" '{
   ]
 }')"
 
-if reply="$(curl -fsS --max-time 60 \
+for attempt in 1 2 3; do
+  if reply="$(curl -fsS --max-time 60 \
     -H "Accept: application/vnd.github+json" \
     -H "Authorization: Bearer ${GITHUB_TOKEN}" \
     -H "X-GitHub-Api-Version: 2022-11-28" \
     -H "Content-Type: application/json" \
     https://models.github.ai/inference/chat/completions \
-    -d "$payload" | jq -er '.choices[0].message.content' | oneline)" && [ -n "$reply" ]; then
-  echo "$reply"
-else
-  echo "GitHub Models summary failed; refusing to publish a guide-content release without a semantic summary." >&2
-  exit 1
-fi
+    -d "$payload" | jq -er '.choices[0].message.content' 2>/dev/null | oneline)" && [ -n "$reply" ]; then
+    echo "$reply"
+    break
+  else
+    if [ "$attempt" -lt 3 ]; then
+      sleep "$attempt"
+    else
+      echo "GitHub Models summary failed after 3 attempts; refusing to publish a guide-content release without a semantic summary." >&2
+      exit 1
+    fi
+  fi
+done
