@@ -14,6 +14,8 @@ Releases use the UTC date as the tag, such as `2026-01-31`. Additional releases 
 
 ## Document contents
 
+The build reads the Markdown with pandoc's Markdown dialect, relaxed so that a heading directly after a list item or paragraph (no blank line) is still a heading, matching GitHub's rendering. The sources are not modified.
+
 The PDF contains, in order: the README introduction, sections 1–11 in filename order (`NN_*.md`), the README Core Takeaways, and a Revisions section.
 
 The guide's Mermaid diagrams are rendered to images for the PDF (see [Diagrams](#diagrams)).

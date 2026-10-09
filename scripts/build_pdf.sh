@@ -42,7 +42,7 @@ combined="$out/ai-security-101.md"
 export MERMAID_OUT_DIR="$out/diagrams"
 
 pandoc "$combined" \
-  --from markdown-smart-tex_math_dollars-raw_tex-yaml_metadata_block+autolink_bare_uris+pipe_tables \
+  --from markdown-smart-tex_math_dollars-raw_tex-yaml_metadata_block-blank_before_header+autolink_bare_uris+pipe_tables \
   --pdf-engine=xelatex \
   --lua-filter="$root/scripts/mermaid.lua" \
   --toc --toc-depth=2 \
