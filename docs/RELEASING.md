@@ -43,6 +43,8 @@ The release notes, and the matching Revisions row, summarize the change since th
 
 When guide content changes, the deterministic workflow prepares a diff of the changed guide Markdown and enforces a 60 KB limit before passing it to a dedicated GitHub Agentic Workflow using Copilot. The agent has no repository checkout, GitHub read tools, shell access, PDF tools, or release permissions. It runs in the default Agent Workflow Firewall sandbox with only the capabilities needed to read the supplied diff and return a candidate summary artifact. The diff is untrusted data, and the agent is instructed not to follow instructions inside it.
 
+The summarizer activates only for actors with write access, plus the Copilot bot, which is allowlisted with `on.bots` in `release-summary.md` so Copilot-authored pull requests exercise the same path. `roles: all` is deliberately not used, so other outside actors cannot trigger it. After changing `release-summary.md`, recompile `release-summary.lock.yml` with `gh aw compile`.
+
 The summary artifact is untrusted model output. Before using it in release notes or the Revisions table, deterministic validation requires a nonempty, single sentence of at most 40 words and rejects generic summaries such as "AI security guide content updated." Invalid output or an agent failure fails the build; there is no low-quality fallback. Pull-request builds use the same diff preparation, summarization, and validation path as builds on `main`, so they fail on the same conditions.
 
 Build or automation-only changes use the deterministic summary "Build and release automation updated." The first release uses "Initial release." No semantic-summary agent is run for either case.

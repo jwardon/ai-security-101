@@ -3,6 +3,8 @@ private: true
 name: Release summary
 description: Generate one semantic summary from an untrusted guide-content diff
 on:
+  bots:
+    - Copilot
   workflow_call:
     inputs:
       guide_diff:
