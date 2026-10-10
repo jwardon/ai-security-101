@@ -1,4 +1,4 @@
-# 8. Security Controls for AI Systems
+# 10. Security Controls for AI Systems
 
 AI defenses mix traditional cybersecurity controls with controls aimed specifically at models, data, retrieval, and behavior. The subsections below mirror the main attack surfaces in this guide: first the goal, then the concrete controls.
 
@@ -41,10 +41,10 @@ Data-poisoning controls aim to prevent unauthorized changes to training and RAG 
 
 ## Predictive-model robustness and extraction controls
 
-These controls aim to make predictive models more robust to crafted inputs and reduce opportunities to copy a model through its deployed interface:
+These controls aim to help predictive models handle inputs deliberately crafted to make them err, and to reduce opportunities to copy a model through its deployed interface:
 
-- **Test against adversarial inputs:** Evaluate models on representative inputs, including plausible adversarially modified examples, and track errors across relevant conditions. Reassess after model or data changes.
-- **Use robustness techniques where appropriate:** Techniques such as adversarial training can improve performance against some evasion attacks, but do not guarantee robustness to new or adaptive attacks.
+- **Test against adversarial inputs:** Evaluate models on representative inputs, including plausible examples deliberately modified to make the model err, and track errors across relevant conditions. Reassess after model or data changes.
+- **Use robustness techniques where appropriate:** Adversarial training adds deliberately modified examples, along with their correct categories, to training so the model learns to classify them correctly. This can improve performance against some evasion attacks, but does not guarantee resistance to new attack strategies.
 - **Protect prediction interfaces:** Authenticate and authorize API clients, apply rate limits, and expose only the outputs clients need; detailed scores or probabilities can make systematic replication easier.
 - **Monitor query behavior:** Look for unusually large, repetitive, or systematically varied query patterns that may indicate extraction, and investigate or limit them.
 

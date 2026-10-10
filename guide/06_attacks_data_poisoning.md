@@ -1,4 +1,4 @@
-# 6. Attacks: Data Poisoning and Predictive Models
+# 6. Attacks: Data Poisoning
 
 Poisoning attacks manipulate information an AI system learns from or relies on to change its behavior. In standard adversarial-ML terminology, data poisoning targets training data. GenAI security discussions also commonly use terms such as RAG or knowledge-base poisoning for tampering with retrieval content used at inference time. They are related integrity attacks, but they hit different parts of the system.
 
@@ -18,4 +18,4 @@ RAG corpus poisoning changes the external knowledge searched at inference time. 
 
 *Example: an attacker adds a convincing internal-looking document that falsely states that payments should be sent to a new bank account. The document only needs to land within the top-k retrieved chunks for a relevant query—not necessarily rank first—to influence the generated answer.*
 
-Other RAG-poisoning strategies include flooding the corpus with near-duplicates, imitating authoritative sources, manipulating metadata, or inserting indirect prompt-injection instructions into documents. Section 8 maps controls to training and RAG poisoning separately.
+Other RAG-poisoning strategies include flooding the corpus with near-duplicates, imitating authoritative sources, manipulating metadata, or inserting indirect prompt-injection instructions into documents. Section 10 maps controls to training and RAG poisoning separately.
