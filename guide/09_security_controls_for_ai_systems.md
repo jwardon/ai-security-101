@@ -1,4 +1,4 @@
-# 10. Security Controls for AI Systems
+# 9. Security Controls for AI Systems
 
 AI defenses mix traditional cybersecurity controls with controls aimed specifically at models, data, retrieval, and behavior. The subsections below mirror the main attack surfaces in this guide: first the goal, then the concrete controls.
 
