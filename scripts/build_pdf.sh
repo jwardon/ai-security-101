@@ -24,8 +24,8 @@ fi
 
 combined="$out/ai-security-101.md"
 {
-  # Guide sources in filename order (NN_name.md).
-  for f in [0-9][0-9]_*.md; do
+  # Guide sources in filename order (guide/NN_name.md).
+  for f in guide/[0-9][0-9]_*.md; do
     echo
     cat "$f"
   done

@@ -1,11 +1,11 @@
 # Releasing the PDF
 
-The Markdown files are the canonical source. The **Release PDF** workflow (`.github/workflows/release-pdf.yml`) builds a PDF from them and publishes it as a GitHub Release. Nothing generated is committed to the repository.
+The Markdown files in `guide/` are the canonical source. The **Release PDF** workflow (`.github/workflows/release-pdf.yml`) builds a PDF from them and publishes it as a GitHub Release. Nothing generated is committed to the repository.
 
 ## Workflow behavior
 
-- **Pull requests** (touching numbered guide sources, `scripts/`, or the release workflow): build and validate the PDF, then upload it as the `ai-security-101-pdf` Actions artifact. Download it from the workflow run to inspect it before merging. No release is created.
-- **Pushes to `main`**: when the guide content (`NN_*.md` source files) or the build/release machinery (`scripts/`, this workflow) changes, build the PDF the same way, then publish that exact PDF as a GitHub Release. Other changes, such as `README.md`, issue templates, or `AGENTS.md`, do not create a release. Releases are only ever created from `main`.
+- **Pull requests** (touching `guide/NN_*.md` sources, `scripts/`, or the release workflow): build and validate the PDF, then upload it as the `ai-security-101-pdf` Actions artifact. Download it from the workflow run to inspect it before merging. No release is created.
+- **Pushes to `main`**: when guide content (`guide/NN_*.md`) or the build/release machinery (`scripts/`, this workflow) changes, build the PDF the same way, then publish that exact PDF as a GitHub Release. Other changes, such as `README.md`, issue templates, or `AGENTS.md`, do not create a release. Releases are only ever created from `main`.
 - **Manual runs** (`workflow_dispatch`): build and upload the artifact only.
 
 ## Versioning
@@ -16,7 +16,7 @@ Releases use the UTC date as the tag, such as `2026-01-31`. Additional releases 
 
 The build reads the Markdown with pandoc's Markdown dialect, relaxed so that a heading directly after a list item or paragraph (no blank line) is still a heading, matching GitHub's rendering. The sources are not modified.
 
-The PDF contains all numbered guide sources in filename order (`NN_*.md`), followed by a Revisions section. `00_introduction.md` contains the guide introduction and contents list, and `12_core_takeaways.md` contains the takeaways. The repository `README.md` is not guide content.
+The PDF contains all numbered guide sources in filename order (`guide/NN_*.md`), followed by a Revisions section. `guide/00_introduction.md` contains the guide introduction and contents list, and `guide/12_core_takeaways.md` contains the takeaways. The repository `README.md` is not guide content.
 
 The guide's Mermaid diagrams are rendered to images for the PDF (see [Diagrams](#diagrams)).
 
