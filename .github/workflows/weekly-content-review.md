@@ -60,3 +60,5 @@ The proposed issue must use these sections:
 - `## Confidence`: State High, Medium, or Low and briefly explain. Do not create an issue for a low-confidence recommendation.
 
 When no material, not-already-tracked development is found, finish successfully without creating an issue.
+
+At the end of every run, provide a concise review summary listing the meaningful developments or themes considered, each with a disposition and brief reason. Dispositions may include `issue warranted`, `already covered by the guide`, `already tracked by an open issue`, `insufficiently material`, `insufficiently verified`, or `otherwise out of scope`. If no issue is created, explicitly state that conclusion and why. Always provide this summary in the final response, including when the correct safe-output action is `noop`. Keep it concise; this is an audit trail, not a comprehensive research report.
