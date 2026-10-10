@@ -1,0 +1,19 @@
+name: Weekly content review
+
+on:
+  schedule:
+    - cron: "17 9 * * 1"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  review:
+    name: Review AI security developments
+    uses: ./.github/workflows/weekly-content-review.lock.yml
+    permissions:
+      contents: read
+      issues: write
+      copilot-requests: write
+    secrets:
+      TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
