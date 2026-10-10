@@ -18,7 +18,7 @@ if git diff --quiet "$prev" HEAD; then
 fi
 
 changed_files="$(git diff --name-only "$prev" HEAD)"
-if ! grep -Eq '^(README\.md|[0-9][0-9]_[^/]+\.md)$' <<<"$changed_files"; then
+if ! grep -Eq '^[0-9][0-9]_[^/]+\.md$' <<<"$changed_files"; then
   echo "Build and release automation updated."
   exit 0
 fi
@@ -28,7 +28,7 @@ if [ -z "$diff_output" ]; then
   exit 1
 fi
 
-git diff --no-color "$prev" HEAD -- README.md ':(glob)[0-9][0-9]_*.md' > "$diff_output"
+git diff --no-color "$prev" HEAD -- ':(glob)[0-9][0-9]_*.md' > "$diff_output"
 diff_size="$(wc -c < "$diff_output")"
 if [ "$diff_size" -gt "$max_diff_bytes" ]; then
   echo "Guide-content diff exceeds the ${max_diff_bytes}-byte semantic summary limit." >&2

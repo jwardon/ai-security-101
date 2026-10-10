@@ -4,8 +4,8 @@ The Markdown files are the canonical source. The **Release PDF** workflow (`.git
 
 ## Workflow behavior
 
-- **Pull requests** (touching Markdown, `scripts/`, or the workflow): build and validate the PDF, then upload it as the `ai-security-101-pdf` Actions artifact. Download it from the workflow run to inspect it before merging. No release is created.
-- **Pushes to `main`**: when the guide content (`README.md`, `NN_*.md` chapters) or the build/release machinery (`scripts/`, this workflow) changes, build the PDF the same way, then publish that exact PDF as a GitHub Release. Other changes, such as issue templates or `AGENTS.md`, do not create a release. Releases are only ever created from `main`.
+- **Pull requests** (touching numbered guide sources, `scripts/`, or the release workflow): build and validate the PDF, then upload it as the `ai-security-101-pdf` Actions artifact. Download it from the workflow run to inspect it before merging. No release is created.
+- **Pushes to `main`**: when the guide content (`NN_*.md` source files) or the build/release machinery (`scripts/`, this workflow) changes, build the PDF the same way, then publish that exact PDF as a GitHub Release. Other changes, such as `README.md`, issue templates, or `AGENTS.md`, do not create a release. Releases are only ever created from `main`.
 - **Manual runs** (`workflow_dispatch`): build and upload the artifact only.
 
 ## Versioning
@@ -16,7 +16,7 @@ Releases use the UTC date as the tag, such as `2026-01-31`. Additional releases 
 
 The build reads the Markdown with pandoc's Markdown dialect, relaxed so that a heading directly after a list item or paragraph (no blank line) is still a heading, matching GitHub's rendering. The sources are not modified.
 
-The PDF contains, in order: the README introduction, sections 1–11 in filename order (`NN_*.md`), the README Core Takeaways, and a Revisions section.
+The PDF contains all numbered guide sources in filename order (`NN_*.md`), followed by a Revisions section. `00_introduction.md` contains the guide introduction and contents list, and `12_core_takeaways.md` contains the takeaways. The repository `README.md` is not guide content.
 
 The guide's Mermaid diagrams are rendered to images for the PDF (see [Diagrams](#diagrams)).
 

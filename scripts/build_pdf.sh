@@ -24,24 +24,11 @@ fi
 
 combined="$out/ai-security-101.md"
 {
-  # README introduction: everything before the Contents list, minus the title.
-  awk '/^## Contents/{exit} NR>1' README.md | sed '/./,$!d'
-} > "$out/intro.md"
-
-{
-  echo "# Introduction"
-  echo
-  cat "$out/intro.md"
-  # Chapters in filename order (NN_name.md).
+  # Guide sources in filename order (NN_name.md).
   for f in [0-9][0-9]_*.md; do
     echo
     cat "$f"
   done
-  # README Core Takeaways, promoted to a top-level section.
-  echo
-  echo "# Core Takeaways"
-  echo
-  awk '/^## Core Takeaways/{found=1; next} found' README.md | sed '/./,$!d'
   if [ -n "$revisions" ] && [ -s "$revisions" ]; then
     echo
     echo "# Revisions"
