@@ -38,6 +38,15 @@ Data-poisoning controls aim to prevent unauthorized changes to training and RAG 
 - **Restrict write access:** Limit which identities and services can modify training stores, RAG corpora, vector indexes, and ingestion pipelines.
 - **Keep trusted recovery points:** Preserve known-good snapshots so poisoned datasets or indexes can be rolled back or rebuilt.
 - **Test behavior against a baseline:** Compare model and retrieval behavior with a trusted baseline after data changes and periodically during normal operation.
+
+## Predictive-model robustness and extraction controls
+
+These controls aim to make predictive models more robust to crafted inputs and reduce opportunities to copy a model through its deployed interface:
+
+- **Test against adversarial inputs:** Evaluate models on representative inputs, including plausible adversarially modified examples, and track errors across relevant conditions. Reassess after model or data changes.
+- **Use robustness techniques where appropriate:** Techniques such as adversarial training can improve performance against some evasion attacks, but do not guarantee robustness to new or adaptive attacks.
+- **Protect prediction interfaces:** Authenticate and authorize API clients, apply rate limits, and expose only the outputs clients need; detailed scores or probabilities can make systematic replication easier.
+- **Monitor query behavior:** Look for unusually large, repetitive, or systematically varied query patterns that may indicate extraction, and investigate or limit them.
 ## Agent and tool controls
 
 Agent and tool controls aim to prevent prompt injection or model errors from gaining privileged access to sensitive systems, limit the actions and data available to the agent, block malformed or unauthorized tool calls, contain dangerous execution, and preserve an audit trail:

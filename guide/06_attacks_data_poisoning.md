@@ -1,4 +1,4 @@
-# 6. Attacks: Data Poisoning
+# 6. Attacks: Data Poisoning and Predictive Models
 
 Poisoning attacks manipulate information an AI system learns from or relies on to change its behavior. In standard adversarial-ML terminology, data poisoning targets training data. GenAI security discussions also commonly use terms such as RAG or knowledge-base poisoning for tampering with retrieval content used at inference time. They are related integrity attacks, but they hit different parts of the system.
 
@@ -19,3 +19,13 @@ RAG corpus poisoning changes the external knowledge searched at inference time. 
 *Example: an attacker adds a convincing internal-looking document that falsely states that payments should be sent to a new bank account. The document only needs to land within the top-k retrieved chunks for a relevant query—not necessarily rank first—to influence the generated answer.*
 
 Other RAG-poisoning strategies include flooding the corpus with near-duplicates, imitating authoritative sources, manipulating metadata, or inserting indirect prompt-injection instructions into documents. Section 8 maps controls to training and RAG poisoning separately.
+
+## Evasion attacks against predictive models
+
+An evasion attack crafts an adversarial example at inference time to make a deployed model produce an incorrect prediction. Unlike poisoning, evasion does not change the model's training data or weights; it targets the model's response to a particular input. For example, carefully chosen changes to a photo could cause an image classifier to label a dog as a wolf. Evasion can target classifiers and other predictive models, and may exploit either digital inputs or changes that can be made in the physical world.
+
+## Model extraction
+
+Model extraction uses queries to a deployed model—often through an API—to build a surrogate that reproduces some of the target model's behavior. For example, an attacker could submit many inputs to a prediction service, collect its labels or scores, and use those input-output pairs to train a local model that approximates the service. The objective is to copy model functionality, not necessarily to recover its exact weights. This is distinct from the privacy attacks in Section 7: extraction need not reveal whether a person’s record was in the training data or reconstruct that record, even though both kinds of attack can involve querying a model.
+
+NIST AI 100-2, [*Adversarial Machine Learning: A Taxonomy and Terminology of Attacks and Mitigations*](https://doi.org/10.6028/NIST.AI.100-2e2023), provides established terminology for evasion and model-extraction attacks. Section 8 covers controls for testing model robustness, protecting prediction interfaces, and monitoring for extraction. These are attacks on the AI system itself; using AI to attack unrelated systems is outside this section's scope.

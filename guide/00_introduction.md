@@ -9,7 +9,7 @@ AI Security 101 is a practical introduction to the concepts needed to understand
 3. [AI/ML System Recon](03_ai_ml_system_recon.md)
 4. [Attacks: Prompt Injection and Jailbreaking](04_attacks_prompt_injection_and_jailbreaking.md)
 5. [Attacks: AI Supply Chain](05_attacks_ai_supply_chain.md)
-6. [Attacks: Data Poisoning](06_attacks_data_poisoning.md)
+6. [Attacks: Data Poisoning and Predictive Models](06_attacks_data_poisoning.md)
 7. [Attacks: Sensitive Information Disclosure and Privacy](07_attacks_sensitive_information_disclosure_and_privacy.md)
 8. [Security Controls for AI Systems](08_security_controls_for_ai_systems.md)
 9. [Guardrail Bypass](09_guardrail_bypass.md)
