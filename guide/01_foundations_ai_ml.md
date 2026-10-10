@@ -6,6 +6,10 @@ A model combines an architecture with learned parameters, commonly called weight
 
 Training and inference are separate phases. This section explains how the pieces work; later sections apply the security concepts to training data, model artifacts, runtime context, and surrounding services.
 
+## Predictive and generative AI
+
+NIST distinguishes Predictive AI (PredAI), which uses inputs to predict or classify outcomes, from Generative AI (GenAI), which generates new content such as text, images, audio, or video. For example, a spam filter that labels an email as junk is PredAI; an LLM that writes an email response is GenAI. These terms describe the kind of output a system produces, not whether it uses machine learning. See [NIST AI 100-2e2025](https://doi.org/10.6028/NIST.AI.100-2e2025) for the taxonomy.
+
 ### How training works
 
 Training repeatedly exposes a model to a training corpus—the collection of data used to train it—and adjusts the weights so the model better satisfies its training objective. For this guide, the key point is that the resulting behavior depends heavily on the corpus, training process, and starting model. Section 6 shows how poisoning a training corpus can intentionally alter learned behavior.

@@ -47,6 +47,7 @@ These controls aim to make predictive models more robust to crafted inputs and r
 - **Use robustness techniques where appropriate:** Techniques such as adversarial training can improve performance against some evasion attacks, but do not guarantee robustness to new or adaptive attacks.
 - **Protect prediction interfaces:** Authenticate and authorize API clients, apply rate limits, and expose only the outputs clients need; detailed scores or probabilities can make systematic replication easier.
 - **Monitor query behavior:** Look for unusually large, repetitive, or systematically varied query patterns that may indicate extraction, and investigate or limit them.
+
 ## Agent and tool controls
 
 Agent and tool controls aim to prevent prompt injection or model errors from gaining privileged access to sensitive systems, limit the actions and data available to the agent, block malformed or unauthorized tool calls, contain dangerous execution, and preserve an audit trail:

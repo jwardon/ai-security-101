@@ -16,7 +16,7 @@ AI supply chains put a few additional properties front and center. Authenticity 
 
 ## Threat modeling, trust boundaries, and attack surface
 
-Threat modeling is a form of risk assessment that asks how a system can be attacked and defended. Start with the system, its data flows, actors, assets, and trust boundaries; then identify threats, evaluate controls, and record the residual risk that remains after defenses are applied. Section 10 develops this process in more detail.
+Threat modeling is a form of risk assessment that asks how a system can be attacked and defended. Start with the system, its data flows, actors, assets, and trust boundaries; then identify threats, evaluate controls, and record the residual risk that remains after defenses are applied. Section 11 develops this process in more detail.
 
 A trust boundary is a line where the level or assumption of trust changes—for example, between a user and an application, an application and external RAG content, or an LLM and a privileged tool. The attack surface is the set of reachable interfaces and behaviors through which an attacker can influence the system.
 
