@@ -143,10 +143,7 @@ jobs:
           echo "MERMAID_CHROME=$(command -v google-chrome)" >> "$GITHUB_ENV"
 
       - name: Download semantic summary
-        id: download_summary
         if: needs.prepare.outputs.summary_mode == 'semantic'
-        # The summary workflow is skipped when the actor lacks write access (e.g. bot-authored PRs), so previews tolerate a missing artifact.
-        continue-on-error: ${{ github.event_name == 'pull_request' }}
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: release-summary
@@ -156,13 +153,9 @@ jobs:
         env:
           SUMMARY_MODE: ${{ needs.prepare.outputs.summary_mode }}
           DETERMINISTIC_SUMMARY: ${{ needs.prepare.outputs.summary }}
-          DOWNLOAD_OUTCOME: ${{ steps.download_summary.outcome }}
         run: |
           mkdir -p build
-          if [ "$SUMMARY_MODE" = "semantic" ] && [ "$DOWNLOAD_OUTCOME" != "success" ]; then
-            echo "Semantic summary unavailable; using placeholder for preview build." >&2
-            echo "Preview build: semantic release summary unavailable." > build/release-notes.txt
-          elif [ "$SUMMARY_MODE" = "semantic" ]; then
+          if [ "$SUMMARY_MODE" = "semantic" ]; then
             scripts/validate_release_summary.sh build/semantic-summary/release-summary.txt > build/release-notes.txt
           else
             printf '%s\n' "$DETERMINISTIC_SUMMARY" > build/release-notes.txt
