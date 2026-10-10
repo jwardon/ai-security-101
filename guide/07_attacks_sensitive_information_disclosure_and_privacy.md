@@ -24,6 +24,9 @@ Active privacy attacks deliberately analyze model behavior or representations to
   - *Example: an attacker compares a model’s confidence on known members and non-members, then uses the difference to estimate whether a particular patient record was included in a private training dataset.*
 - **Data reconstruction (often called model inversion):** Use model outputs or exposed representations to reconstruct sensitive training information, attributes, or representative inputs.
   - *Example: repeated queries to a face-recognition model are used to reconstruct an approximation of facial features represented in its private training data.*
+- **Model extraction:** Repeatedly query a deployed model to train a local model that behaves similarly. [NIST AI 100-2e2025](https://doi.org/10.6028/NIST.AI.100-2e2025) classifies model extraction as a privacy attack.
+  - *Example: an attacker submits many images to an online image classifier, records its predicted categories, and uses those image-category pairs to train a local classifier that imitates it.*
+  - Unlike model inversion, which aims to infer sensitive information from the model's training data, extraction aims to copy the model's behavior; it need not reveal individual training records.
 - **Training-data extraction:** Repeatedly or strategically query a generative model to elicit memorized training sequences.
   - *Example: targeted prompts cause a model to reproduce passages from a confidential document that was accidentally included in its training corpus.*
 - **Embedding inversion:** Analyze an embedding—sometimes with an auxiliary model or search process—to infer text, attributes, or semantically similar content that could have produced it.

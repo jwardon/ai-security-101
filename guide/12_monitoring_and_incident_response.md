@@ -1,4 +1,4 @@
-# 11. Monitoring and Incident Response
+# 12. Monitoring and Incident Response
 
 Monitoring closes the loop between preventive controls and real behavior. AI systems need infrastructure telemetry—requests, errors, latency, resource use, authentication events, and tool actions—plus behavioral testing. Hashes and versions tell you what you deployed; behavior tells you what it actually did. Useful monitoring can correlate a change with the exact model, adapter, prompt/configuration, vector index, dependency, or provider version involved.
 

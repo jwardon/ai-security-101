@@ -6,6 +6,10 @@ A model combines an architecture with learned parameters, commonly called weight
 
 Training and inference are separate phases. This section explains how the pieces work; later sections apply the security concepts to training data, model artifacts, runtime context, and surrounding services.
 
+## Predictive and generative AI
+
+NIST distinguishes Predictive AI (PredAI), which uses inputs to predict or classify outcomes, from Generative AI (GenAI), which generates new content such as text, images, audio, or video. For example, a spam filter that labels an email as junk is PredAI; an LLM that writes an email response is GenAI. These terms describe the kind of output a system produces, not whether it uses machine learning. See [NIST AI 100-2e2025](https://doi.org/10.6028/NIST.AI.100-2e2025) for the taxonomy.
+
 ### How training works
 
 Training repeatedly exposes a model to a training corpus—the collection of data used to train it—and adjusts the weights so the model better satisfies its training objective. For this guide, the key point is that the resulting behavior depends heavily on the corpus, training process, and starting model. Section 6 shows how poisoning a training corpus can intentionally alter learned behavior.
@@ -42,7 +46,7 @@ Top-k means the retrieval system returns the k highest-ranked matches—for exam
 
 Many RAG systems use embeddings for retrieval. An embedding model converts text into a vector—a list of numbers that captures useful semantic relationships. Vector search compares those vectors so text with similar meaning can be found even when the wording differs.
 
-Long documents are usually divided into chunks before embedding. A chunk is much larger than a token: commonly a paragraph, several paragraphs, or a few hundred tokens, depending on the application. Stored chunks can be associated with metadata such as source, owner, tenant, classification, date, or access-control attributes. Section 8 shows how that metadata can help restrict retrieval to records the requester is authorized to read.
+Long documents are usually divided into chunks before embedding. A chunk is much larger than a token: commonly a paragraph, several paragraphs, or a few hundred tokens, depending on the application. Stored chunks can be associated with metadata such as source, owner, tenant, classification, date, or access-control attributes. Section 9 shows how that metadata can help restrict retrieval to records the requester is authorized to read.
 
 ## Classifiers
 
@@ -61,7 +65,7 @@ flowchart TB
     input ~~~ output
 ```
 
-AI applications often use smaller classifiers around a larger LLM because they can run faster and at lower cost. Useful? Absolutely. Infallible? No. Classification boundaries can be uncertain, inputs can fall outside the detector's training distribution, and attackers can deliberately search for evasive inputs. Section 8 covers classifiers as guardrails; Section 9 covers bypass techniques.
+AI applications often use smaller classifiers around a larger LLM because they can run faster and at lower cost. Useful? Absolutely. Infallible? No. Classification boundaries can be uncertain, inputs can fall outside the detector's training distribution, and attackers can deliberately search for evasive inputs. Section 9 covers classifiers as guardrails; Section 10 covers bypass techniques.
 
 ## Agents and tools
 
@@ -85,7 +89,7 @@ sequenceDiagram
     A-->>U: response
 ```
 
-Tool use turns model output into actions with real consequences. This is where "the model said something weird" can become "the model did something weird." Section 8 covers the controls that should sit between a model proposal and actual authority.
+Tool use turns model output into actions with real consequences. This is where "the model said something weird" can become "the model did something weird." Section 9 covers the controls that should sit between a model proposal and actual authority.
 
 ## Fine-tuning, adapters, and derived models
 
@@ -97,7 +101,7 @@ LoRA (Low-Rank Adaptation) is a common parameter-efficient technique. It produce
 
 Evaluation asks a basic question: does the model or AI system behave as expected for its intended use? Tests can cover task quality, robustness, privacy, refusal behavior, tool-use correctness, response time, cost, and security-relevant behavior. Evaluation also establishes a baseline: a repeatable description of expected behavior under known inputs.
 
-Section 8 returns to this baseline for behavioral testing. Run baseline tests after model, artifact, prompt, or data changes—and periodically when nothing is supposed to have changed. Unexpected drift can reveal poisoned data or retrieval content, compromised artifacts, provider-side changes, configuration changes, or other attacks and failures that static inventory alone cannot detect.
+Section 9 returns to this baseline for behavioral testing. Run baseline tests after model, artifact, prompt, or data changes—and periodically when nothing is supposed to have changed. Unexpected drift can reveal poisoned data or retrieval content, compromised artifacts, provider-side changes, configuration changes, or other attacks and failures that static inventory alone cannot detect.
 
 ## How the pieces fit together
 

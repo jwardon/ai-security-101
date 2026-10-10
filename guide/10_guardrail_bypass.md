@@ -1,4 +1,4 @@
-# 9. Guardrail Bypass
+# 10. Guardrail Bypass
 
 Attackers may craft inputs specifically to evade model-based guardrails. Input classifiers are often much smaller than the LLMs they protect to keep latency, cost, and compute overhead low. The tradeoff is a potential capability gap: text the classifier misses may still be understood by the larger LLM.
 

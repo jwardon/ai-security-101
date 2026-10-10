@@ -1,4 +1,4 @@
-# 10. Threat Modeling and Risk Assessment
+# 11. Threat Modeling and Risk Assessment
 
 Threat modeling turns the architecture into a security model. A common starting point is to map actors, components, data stores, data flows, and trust boundaries so the team can see where trust changes and where an attacker can interact with or influence the system.
 
