@@ -39,6 +39,7 @@
 #   - actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
 #   - actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
 #   - actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+#   - github/gh-aw/actions/setup@9d0a5a0453b09ac1e6dcd22dc5ee124803323faa
 #
 # Container images used:
 #   - ghcr.io/github/gh-aw-firewall/agent:0.28.50@sha256:91fe4af8373c723d4d2e0706a0c35d310c2eeadaea5e0738c725b3861042f620
@@ -142,7 +143,7 @@ jobs:
           persist-credentials: false
       - name: Setup Scripts
         id: setup
-        uses: ./actions/setup
+        uses: github/gh-aw/actions/setup@9d0a5a0453b09ac1e6dcd22dc5ee124803323faa
         with:
           destination: ${{ runner.temp }}/gh-aw/actions
           job-name: ${{ github.job }}
@@ -499,7 +500,7 @@ jobs:
           persist-credentials: false
       - name: Setup Scripts
         id: setup
-        uses: ./actions/setup
+        uses: github/gh-aw/actions/setup@9d0a5a0453b09ac1e6dcd22dc5ee124803323faa
         with:
           destination: ${{ runner.temp }}/gh-aw/actions
           job-name: ${{ github.job }}
@@ -1292,7 +1293,7 @@ jobs:
           persist-credentials: false
       - name: Setup Scripts
         id: setup
-        uses: ./actions/setup
+        uses: github/gh-aw/actions/setup@9d0a5a0453b09ac1e6dcd22dc5ee124803323faa
         with:
           destination: ${{ runner.temp }}/gh-aw/actions
           job-name: ${{ github.job }}
@@ -1625,7 +1626,7 @@ jobs:
           persist-credentials: false
       - name: Setup Scripts
         id: setup
-        uses: ./actions/setup
+        uses: github/gh-aw/actions/setup@9d0a5a0453b09ac1e6dcd22dc5ee124803323faa
         with:
           destination: ${{ runner.temp }}/gh-aw/actions
           job-name: ${{ github.job }}
@@ -1921,7 +1922,7 @@ jobs:
           persist-credentials: false
       - name: Setup Scripts
         id: setup
-        uses: ./actions/setup
+        uses: github/gh-aw/actions/setup@9d0a5a0453b09ac1e6dcd22dc5ee124803323faa
         with:
           destination: ${{ runner.temp }}/gh-aw/actions
           job-name: ${{ github.job }}
@@ -2001,7 +2002,7 @@ jobs:
           persist-credentials: false
       - name: Setup Scripts
         id: setup
-        uses: ./actions/setup
+        uses: github/gh-aw/actions/setup@9d0a5a0453b09ac1e6dcd22dc5ee124803323faa
         with:
           destination: ${{ runner.temp }}/gh-aw/actions
           job-name: ${{ github.job }}
