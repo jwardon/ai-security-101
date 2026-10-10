@@ -64,6 +64,7 @@ When researching or adding factual material:
 - Do not weaken repository security, review, or validation controls unless explicitly required by the issue.
 - Do not introduce secrets, credentials, or environment-specific values into the repository.
 - Grant workflows only the permissions they require.
+- Keep workflow YAML focused on orchestration. Straightforward command sequences and small, locally understandable shell expressions can stay inline; substantial control flow, parsing, validation, or reusable behavior belongs in a script under `scripts/`. Don't extract simple inline logic just because it contains a conditional or shell operator.
 - Prefer built-in platform capabilities and straightforward implementations over unnecessary dependencies.
 
 ## Validation
