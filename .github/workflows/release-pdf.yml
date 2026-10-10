@@ -3,7 +3,7 @@ name: Release PDF
 on:
   pull_request:
     paths:
-      - "*.md"
+      - "guide/[0-9][0-9]_*.md"
       - "scripts/**"
       - ".github/workflows/release-pdf.yml"
       - ".github/workflows/release-summary.md"
@@ -12,8 +12,7 @@ on:
     branches:
       - main
     paths:
-      - "README.md"
-      - "[0-9][0-9]_*.md"
+      - "guide/[0-9][0-9]_*.md"
       - "scripts/**"
       - ".github/workflows/release-pdf.yml"
       - ".github/workflows/release-summary.md"

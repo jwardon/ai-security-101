@@ -1,11 +1,11 @@
 # Releasing the PDF
 
-The Markdown files are the canonical source. The **Release PDF** workflow (`.github/workflows/release-pdf.yml`) builds a PDF from them and publishes it as a GitHub Release. Nothing generated is committed to the repository.
+The Markdown files in `guide/` are the canonical source. The **Release PDF** workflow (`.github/workflows/release-pdf.yml`) builds a PDF from them and publishes it as a GitHub Release. Nothing generated is committed to the repository.
 
 ## Workflow behavior
 
-- **Pull requests** (touching Markdown, `scripts/`, or the workflow): build and validate the PDF, then upload it as the `ai-security-101-pdf` Actions artifact. Download it from the workflow run to inspect it before merging. No release is created.
-- **Pushes to `main`**: when the guide content (`README.md`, `NN_*.md` chapters) or the build/release machinery (`scripts/`, this workflow) changes, build the PDF the same way, then publish that exact PDF as a GitHub Release. Other changes, such as issue templates or `AGENTS.md`, do not create a release. Releases are only ever created from `main`.
+- **Pull requests** (touching `guide/NN_*.md` sources, `scripts/`, or the release workflow): build and validate the PDF, then upload it as the `ai-security-101-pdf` Actions artifact. Download it from the workflow run to inspect it before merging. No release is created.
+- **Pushes to `main`**: when guide content (`guide/NN_*.md`) or the build/release machinery (`scripts/`, this workflow) changes, build the PDF the same way, then publish that exact PDF as a GitHub Release. Other changes, such as `README.md`, issue templates, or `AGENTS.md`, do not create a release. Releases are only ever created from `main`.
 - **Manual runs** (`workflow_dispatch`): build and upload the artifact only.
 
 ## Versioning
@@ -16,7 +16,7 @@ Releases use the UTC date as the tag, such as `2026-01-31`. Additional releases 
 
 The build reads the Markdown with pandoc's Markdown dialect, relaxed so that a heading directly after a list item or paragraph (no blank line) is still a heading, matching GitHub's rendering. The sources are not modified.
 
-The PDF contains, in order: the README introduction, sections 1–11 in filename order (`NN_*.md`), the README Core Takeaways, and a Revisions section.
+The PDF contains all numbered guide sources in filename order (`guide/NN_*.md`), followed by a Revisions section. `guide/00_introduction.md` contains the guide introduction and contents list, and `guide/12_core_takeaways.md` contains the takeaways. The repository `README.md` is not guide content.
 
 The guide's Mermaid diagrams are rendered to images for the PDF (see [Diagrams](#diagrams)).
 
@@ -42,6 +42,8 @@ Diagrams in the guide are Mermaid code blocks. GitHub renders them natively in M
 The release notes, and the matching Revisions row, summarize the change since the previous release. Pull-request preview PDFs include this prospective revision row using the same summary as a release. Commit messages and PR titles are not used.
 
 When guide content changes, the deterministic workflow prepares a diff of the changed guide Markdown and enforces a 60 KB limit before passing it to a dedicated GitHub Agentic Workflow using Copilot. The agent has no repository checkout, GitHub read tools, shell access, PDF tools, or release permissions. It runs in the default Agent Workflow Firewall sandbox with only the capabilities needed to read the supplied diff and return a candidate summary artifact. The diff is untrusted data, and the agent is instructed not to follow instructions inside it.
+
+For the one-time migration from root-level guide sources, the workflow verifies that the previous release's README introduction, contents, and takeaways match their relocated guide sources. If the move contains no substantive guide changes, it uses a deterministic structural summary instead of treating the relocated text as new content. When guide content also changes, unchanged relocated sections are excluded from the semantic diff and the migration is identified in its context; substantive edits remain subject to the same 60 KB limit.
 
 The summarizer activates only for actors with write access, plus the Copilot bot, which is allowlisted with `on.bots` in `release-summary.md` so Copilot-authored pull requests exercise the same path. `roles: all` is deliberately not used, so other outside actors cannot trigger it. The agent uploads `release-summary.txt` unarchived, and gh-aw names such an artifact after the file (`release-summary.txt`) regardless of the `name` requested in the prompt, so the build downloads `release-summary.txt`. After changing `release-summary.md`, recompile `release-summary.lock.yml` with `gh aw compile`.
 

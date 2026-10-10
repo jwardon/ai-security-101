@@ -7,7 +7,7 @@ AI Security 101 is a practical introduction to AI security for both:
 - Security practitioners who need enough AI/ML knowledge to understand AI-specific security risks.
 - AI/ML practitioners who need enough security knowledge to understand how traditional and AI-specific security principles apply to AI systems.
 
-The repository's Markdown files are the canonical source for the guide.
+The Markdown files in `guide/` are the canonical source for the guide.
 
 ## General Guidelines
 
