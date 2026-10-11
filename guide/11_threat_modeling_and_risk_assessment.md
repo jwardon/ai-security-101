@@ -1,6 +1,6 @@
 # 11. Threat Modeling and Risk Assessment
 
-Threat modeling turns the architecture into a security model. A common starting point is to map actors, components, data stores, data flows, and trust boundaries so the team can see where trust changes and where an attacker can interact with or influence the system.
+Threat modeling turns the architecture into a security model. A common starting point is to map actors, components, data stores, data flows, and trust boundaries so the team can see where trust changes and where an attacker can interact with or influence the system. For example, an agent that reads an untrusted email, searches internal files through a privileged tool, and stores persistent memory crosses boundaries between the email, the tool's authority, and stored state. Delegating work to another agent adds a further boundary.
 
 From that model, identify what can go wrong: which external or untrusted inputs can reach each component, which identities and privileges are involved, what data or artifacts could be modified or disclosed, and what actions an attacker could cause. Then map preventive, detective, limiting, and recovery controls to those threats.
 
@@ -12,12 +12,6 @@ flowchart LR
     controls --> assess["4. Assess likelihood<br/>and impact"] --> residual["5. Record<br/>residual risk"] --> revisit["6. Revisit as system<br/>changes"]
     revisit -. "repeat" .-> map
 ```
-
-## Agentic systems add trust boundaries
-
-An agentic system can use tools, act under a user's or service's identity, retain state between tasks, and take actions across multiple steps. Its threat model therefore includes the boundaries around tool access and authority, persistent memory, and autonomous actions that affect external systems. A compromised or manipulated step can influence later actions, not just the current response.
-
-These capabilities create paths for goal hijacking through untrusted content, tool misuse, memory or context poisoning, abuse of excessive or mis-scoped authority, and supply-chain compromise of agent or tool components. Autonomous steps can also propagate a bad decision into cascading actions. When agents communicate or delegate work, that interaction adds another trust boundary: a message or requested action is not inherently trustworthy just because it came from another agent. See Section 9 for agent and tool controls.
 
 ## Frameworks that help
 
@@ -33,7 +27,7 @@ No single framework covers every part of AI security. These four are useful for 
   It is useful for systematically reviewing components, data flows, and trust boundaries.
 - **[MITRE ATLAS](https://atlas.mitre.org/) - Adversarial Threat Landscape for Artificial Intelligence Systems.** It is a living knowledge base of AI-focused adversary tactics and techniques: tactics describe adversary goals, while techniques describe methods used to achieve them. Use it when asking how a real attacker might achieve an objective against models, data, or AI-enabled applications, and when planning threat-informed testing or red-team scenarios.
 - **[OWASP Top 10 for LLM Applications 2026](https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/) - recurring application risks and mitigations.** OWASP organizes common implementation risks such as prompt injection, sensitive-information disclosure, supply-chain weaknesses, and excessive agency. It is useful as an application-security checklist and mitigation reference, especially for generative-AI systems.
-- **[OWASP Top 10 for Agentic Applications 2026](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/) - risks specific to autonomous agents and their interactions.** It calls out concerns such as agent goal hijacking, tool misuse, identity and privilege abuse, memory and context poisoning, insecure inter-agent communication, and cascading failures.
+- **[OWASP Top 10 for Agentic Applications 2026](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/) - risks involving agents' goals, actions, authority, state, and interactions.** Use it alongside the LLM Top 10 when an application gives a model the ability to act or delegate work.
 These frameworks describe different layers of risk, not competing classifications. STRIDE helps find broad threat classes in the architecture; ATLAS describes AI adversary tactics and techniques; the OWASP LLM Top 10 covers application risks involving LLMs; and the OWASP Agentic Top 10 adds risks from agent autonomy, authority, state, tools, and interactions. A single incident can fit all four, and a review can use whichever combination fits its scope.
 
 ### Example: indirect prompt injection in a document assistant

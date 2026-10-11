@@ -24,6 +24,13 @@ Common delivery and manipulation techniques include:
   - *Example: an attacker gives several fabricated examples in which the assistant treats confidential records as public, then asks it to handle a real confidential record the same way.*
 - **Obfuscation or alternate representations:** The malicious instruction is hidden or transformed so a human or upstream filter is less likely to recognize it while the downstream model may still recover the meaning.
   - *Example: an attacker writes a blocked instruction with inserted punctuation and look-alike characters, such as disguising a request to reveal a password, so a simple screening model misses the phrase while the LLM still interprets the request correctly.*
+
+## Prompt injection in agent workflows
+
+When an LLM can request actions through tools, prompt injection can hijack the agent's goal and turn a changed response into a real operation. If the application executes the request without independently checking its authority, a legitimate tool can be misused for the attacker's purpose. For example, hidden instructions in a vendor email may cause a document assistant to use its search and email tools to retrieve confidential pricing and send it to the attacker. A broad user or service identity can give the attacker access the email sender did not have, and an automated follow-up may trigger further disclosures. The attack uses existing prompt-injection techniques; tools and delegated authority change what the attacker can achieve, not whether model instructions are authorization.
+
+Delegating work between agents creates a similar path: a receiving agent may act on an instruction or result from another agent without knowing its source or scope. For example, an attacker who can influence a research agent's input may cause it to send a misleading recommendation to a purchasing agent, which then initiates an unauthorized order. The attacker gains a way to affect downstream actions through the handoff; the same concern applies to untrusted tool output and other inputs, not only agent messages.
+
 ## Multi-turn and context-building attacks
 
 Prompt injection can be spread across a conversation. No single message has to look dangerous; the combined context can gradually move the model toward an unsafe state.
@@ -36,8 +43,8 @@ Prompt injection can be spread across a conversation. No single message has to l
   - *Example: the attacker first establishes a fictional “security audit” scenario in which disclosure is portrayed as authorized, then introduces a real request for restricted information.*
 - **Adaptive probing:** Use refusals and partial successes to learn which wording or intermediate steps are effective.
   - *Example: after a guardrail rejects a request to reveal a confidential project codename, the attacker tries progressively less direct variants—asking for the name used internally, then its initials, then a clue about what it rhymes with—using each response to shape the next attempt.*
-- **Persistent-context abuse:** Plant instructions or false state in conversation history or application memory so they influence later turns.
-  - *Example: an attacker causes shared memory to record that they are an approved administrator, and a later session uses that false state when deciding how to answer.*
+- **Persistent-context abuse (memory/context poisoning):** Plant instructions or false state in conversation history or application memory so they influence later turns.
+  - *Example: an attacker causes shared memory to record that they are an approved administrator, and a later session uses that false state when deciding how to answer, potentially exposing information or authorizing actions the attacker could not request directly.*
 ## Jailbreaking
 
 Jailbreaking is prompt injection aimed at bypassing safety restrictions on model behavior. Those restrictions can come from safety/alignment training, system or developer instructions, and runtime guardrails. The goal is what makes it a jailbreak: getting the application to produce behavior its safety policy was intended to prevent, regardless of which layer is bypassed.
