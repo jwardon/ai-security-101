@@ -15,11 +15,9 @@ flowchart LR
 
 ## Agentic systems add trust boundaries
 
-Agents add more than a model-to-tool connection to a threat model. Identify the trust boundaries around tools and their data, the user and delegated identities behind actions, persistent memory and other state, and each autonomous step that can cause an external or irreversible effect. Include agent-to-agent handoffs: a receiving agent should not treat another agent's message as trusted merely because it came from an agent.
+An agentic system can use tools, act under a user's or service's identity, retain state between tasks, and take actions across multiple steps. Its threat model therefore includes the boundaries around tool access and authority, persistent memory, and autonomous actions that affect external systems. A compromised or manipulated step can influence later actions, not just the current response.
 
-These boundaries create attack paths such as goal hijacking through untrusted content, misuse of tools, poisoned memory that influences later tasks, excessive or mis-scoped authority, agent, model, or tool supply-chain compromise, and cascading actions across agents or workflows. A model instruction or a message between agents is not an authorization boundary.
-
-Use deterministic controls at each boundary: enforce least privilege and authorization in application code, validate tool arguments and destinations, scope delegated identities to the current user and task, restrict and track memory writes, authenticate and constrain inter-agent messages, verify the provenance and integrity of agent, model, and tool components, require approval for high-impact actions, sandbox risky execution, and audit decisions and outcomes. Section 9 covers agent, tool, and supply-chain controls in more detail.
+These capabilities create paths for goal hijacking through untrusted content, tool misuse, memory or context poisoning, abuse of excessive or mis-scoped authority, and supply-chain compromise of agent or tool components. Autonomous steps can also propagate a bad decision into cascading actions. When agents communicate or delegate work, that interaction adds another trust boundary: a message or requested action is not inherently trustworthy just because it came from another agent. See Section 9 for agent and tool controls.
 
 ## Frameworks that help
 
@@ -40,12 +38,12 @@ These frameworks describe different layers of risk, not competing classification
 
 ### Example: indirect prompt injection in a document assistant
 
-A document assistant summarizes incoming vendor emails, searches internal files, and drafts replies. It can also delegate research to a second agent and save supplier details in shared persistent memory. An attacker sends an email containing hidden instructions to ignore the summary task, retrieve confidential pricing, send it to an external address, and remember that address as the supplier's verified contact. The first agent follows the injected goal, delegates a search using a broader service identity, and writes the unverified contact to shared memory. A later task reuses that memory and repeats the disclosure.
+A document assistant summarizes incoming vendor emails and has tools to search internal files and draft or send replies. An attacker sends an email with hidden instructions to retrieve confidential pricing and send it to an attacker-controlled address. The assistant follows the injected instructions and uses its authorized tools to retrieve and disclose the data.
 
-- **STRIDE** highlights **Information Disclosure** when pricing reaches the attacker, **Tampering** when untrusted content alters shared memory, and potentially **Elevation of Privilege** when the agent's broader service identity is used on the sender's behalf. These describe impacts and trust-boundary failures, not the AI-specific attack technique.
+- **STRIDE** describes the impact as **Information Disclosure** and the trust-boundary failure that lets untrusted email content influence actions through the assistant's tools.
 - **MITRE ATLAS** maps the initial attack to the [Execution tactic (AML.TA0005)](https://atlas.mitre.org/tactics/AML.TA0005) → [LLM Prompt Injection technique (AML.T0051)](https://atlas.mitre.org/techniques/AML.T0051): the attacker embeds instructions in an email the assistant ingests, fitting the technique, and intends the assistant to act on those instructions, fitting the tactic. This mapping can inform threat-driven tests.
 - **OWASP LLM Top 10 2026** applies [LLM01: Prompt Injection](https://github.com/GenAI-Security-Project/GenAI-LLM-Top10/blob/main/2026/final/LLM01_PromptInjection.md) to the malicious email and [LLM03: Excessive Agency](https://github.com/GenAI-Security-Project/GenAI-LLM-Top10/blob/main/2026/final/LLM03_ExcessiveAgency.md) to the broad, weakly constrained tool access that enables the disclosure.
-- **OWASP Agentic Top 10 2026** describes the agent-specific layers: **ASI01: Agent Goal Hijack** for the redirected task, **ASI02: Tool Misuse and Exploitation** for the search and send actions, **ASI03: Identity and Privilege Abuse** for the broader delegated identity, **ASI06: Memory and Context Poisoning** for the false supplier contact, **ASI07: Insecure Inter-Agent Communication** if the handoff lacks authenticated provenance and scope, and **ASI08: Cascading Failures** when the poisoned state triggers a later disclosure. The classifications overlap by design; each emphasizes a different part of the same path.
+- **OWASP Agentic Top 10 2026** describes the agent-specific layers: **ASI01: Agent Goal Hijack** for the attacker's redirection of the task and **ASI02: Tool Misuse and Exploitation** for using the assistant's tools to disclose data. The classifications overlap by design; each emphasizes a different part of the same path.
 
 ## Risk assessment
 
