@@ -2,14 +2,6 @@
 
 AI defenses mix traditional cybersecurity controls with controls aimed specifically at models, data, retrieval, and behavior. The subsections below mirror the main attack surfaces in this guide: first the goal, then the concrete controls.
 
-## Frameworks for organizing controls
-
-The [NIST Cybersecurity Framework (CSF) 2.0](https://www.nist.gov/cyberframework) is a general, risk-based framework for managing cybersecurity outcomes and applies to AI systems as well as other technology. Its Govern, Identify, Protect, Detect, Respond, and Recover functions offer a way to organize the controls below without prescribing a single implementation. For example, inventorying models and dependencies supports Identify; access checks and least privilege support Protect; behavioral testing and audit logs support Detect; and preserving known-good data for rollback supports Recover.
-
-The [NIST AI Risk Management Framework (AI RMF)](https://www.nist.gov/itl/ai-risk-management-framework) complements CSF by providing a lifecycle-oriented process for managing risks specific to AI systems: Govern, Map, Measure, and Manage. Use it to frame the system's context and impacts, assess AI-specific risks such as data poisoning or model behavior drift, and prioritize and track responses; the relevant Section 9 controls are possible responses, not a complete AI RMF implementation. Neither framework is a certification that a system is secure.
-
-NIST's [draft Cybersecurity Framework Profile for Artificial Intelligence (Cyber AI Profile)](https://csrc.nist.gov/pubs/ir/8596/iprd) and its work on AI security control overlays are relevant emerging efforts to apply cybersecurity practices to AI. The Cyber AI Profile remains draft material, and the overlays are still being developed; neither should be treated as finalized control guidance.
-
 ## Prompt injection and context controls
 
 These controls aim to reduce the chance that untrusted content changes model behavior, prevent model output from bypassing access or privilege checks, limit what a successful injection can reach, and make injection attempts easier to detect and test:
