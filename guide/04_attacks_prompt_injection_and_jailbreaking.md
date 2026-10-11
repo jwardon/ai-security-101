@@ -27,9 +27,18 @@ Common delivery and manipulation techniques include:
 
 ## Prompt injection in agent workflows
 
-When an LLM can request actions through tools, prompt injection can hijack the agent's goal and turn a changed response into a real operation. If the application executes the request without independently checking its authority, a legitimate tool can be misused for the attacker's purpose. For example, hidden instructions in a vendor email may cause a document assistant to use its search and email tools to retrieve confidential pricing and send it to the attacker. A broad user or service identity can give the attacker access the email sender did not have, and an automated follow-up may trigger further disclosures. The attack uses existing prompt-injection techniques; tools and delegated authority change what the attacker can achieve, not whether model instructions are authorization.
+When an LLM can use tools or delegate work, prompt injection can affect operations as well as generated text. These capabilities can extend existing attack paths and increase their impact; they do not make the threats exclusive to agents or turn model instructions into authorization.
 
-Delegating work between agents creates a similar path: a receiving agent may act on an instruction or result from another agent without knowing its source or scope. For example, an attacker who can influence a research agent's input may cause it to send a misleading recommendation to a purchasing agent, which then initiates an unauthorized order. The attacker gains a way to affect downstream actions through the handoff; the same concern applies to untrusted tool output and other inputs, not only agent messages.
+- **Goal hijacking:** Untrusted content redirects the agent from its intended task toward an attacker-chosen objective.
+  - *Example: a vendor email tells a document assistant to ignore its summary task and send confidential pricing to the sender; the assistant follows the new goal and discloses the pricing.*
+- **Tool misuse:** An agent uses a legitimate tool for an unauthorized purpose because it follows attacker-controlled instructions.
+  - *Example: the injected email asks the assistant to search internal files and send a pricing document to an external address; the attacker obtains data the email itself could not access.*
+- **Identity and privilege abuse:** The agent's user or service identity may have broader permissions than the person or content that influenced it.
+  - *Example: an assistant acts with a service account that can read every department's files, so an injected request in a vendor email exposes another department's confidential contract.*
+- **Insecure agent-to-agent communication:** A receiving agent may trust a delegated request or result without verifying its source, integrity, or scope.
+  - *Example: an attacker able to alter messages on an unprotected agent handoff inserts a false approval for a refund; the receiving agent issues it, transferring money to the attacker.*
+- **Cascading actions:** An agent's autonomous follow-up steps can carry an injected instruction or mistaken result into additional operations.
+  - *Example: after an injected email causes an assistant to change a supplier's payment details, an automated workflow uses the changed details for the next invoice, redirecting the payment to the attacker.*
 
 ## Multi-turn and context-building attacks
 

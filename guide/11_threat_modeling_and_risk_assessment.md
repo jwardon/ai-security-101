@@ -1,6 +1,6 @@
 # 11. Threat Modeling and Risk Assessment
 
-Threat modeling turns the architecture into a security model. A common starting point is to map actors, components, data stores, data flows, and trust boundaries so the team can see where trust changes and where an attacker can interact with or influence the system. For example, an agent that reads an untrusted email, searches internal files through a privileged tool, and stores persistent memory crosses boundaries between the email, the tool's authority, and stored state. Delegating work to another agent adds a further boundary.
+Threat modeling turns the architecture into a security model. A common starting point is to map actors, components, data stores, data flows, and trust boundaries so the team can see where trust changes and where an attacker can interact with or influence the system.
 
 From that model, identify what can go wrong: which external or untrusted inputs can reach each component, which identities and privileges are involved, what data or artifacts could be modified or disclosed, and what actions an attacker could cause. Then map preventive, detective, limiting, and recovery controls to those threats.
 
