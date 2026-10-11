@@ -30,6 +30,8 @@ No single framework covers every part of AI security. These four are useful for 
 - **[OWASP Top 10 for Agentic Applications 2026](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/) - risks involving agents' goals, actions, authority, state, and interactions.** Use it alongside the LLM Top 10 when an application gives a model the ability to act or delegate work.
 These frameworks describe different layers of risk, not competing classifications. STRIDE helps find broad threat classes in the architecture; ATLAS describes AI adversary tactics and techniques; the OWASP LLM Top 10 covers application risks involving LLMs; and the OWASP Agentic Top 10 adds risks from agent autonomy, authority, state, tools, and interactions. A single incident can fit all four, and a review can use whichever combination fits its scope.
 
+These threat frameworks help identify and classify what can go wrong; they do not organize or govern the controls used to address it. Pair them with Section 9's practical safeguards and control frameworks such as NIST CSF 2.0 and the AI RMF: the threat analysis helps identify what needs addressing, while control and risk frameworks help organize safeguards, evaluation, and follow-up.
+
 ### Example: indirect prompt injection in a document assistant
 
 A document assistant summarizes incoming vendor emails and has tools to search internal files and draft or send replies. An attacker sends an email with hidden instructions to retrieve confidential pricing and send it to an attacker-controlled address. The assistant follows the injected instructions and uses its authorized tools to retrieve and disclose the data.
