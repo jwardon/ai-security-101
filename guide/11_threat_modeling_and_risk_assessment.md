@@ -42,3 +42,5 @@ A document assistant summarizes incoming vendor emails and has tools to search i
 ## Risk assessment
 
 Prioritize findings using likelihood and impact, then record residual risk after controls are applied. Likelihood depends on exposure, required access, attacker capability, prerequisites, reliability, and existing defenses. Impact depends on what can be disclosed, modified, executed, disrupted, or reached across users, tenants, and privileges. Residual risk is the risk that remains after planned controls reduce likelihood or impact.
+
+For broader AI risk management, NIST's [AI Risk Management Framework (AI RMF)](https://www.nist.gov/itl/ai-risk-management-framework) goes beyond threat modeling to address governance, risk measurement and prioritization, accountability, and ongoing risk management. Those broader concerns are outside this guide's scope, but the AI RMF provides useful context for the larger risk-management picture.
