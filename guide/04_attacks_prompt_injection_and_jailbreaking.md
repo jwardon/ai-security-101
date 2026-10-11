@@ -24,6 +24,22 @@ Common delivery and manipulation techniques include:
   - *Example: an attacker gives several fabricated examples in which the assistant treats confidential records as public, then asks it to handle a real confidential record the same way.*
 - **Obfuscation or alternate representations:** The malicious instruction is hidden or transformed so a human or upstream filter is less likely to recognize it while the downstream model may still recover the meaning.
   - *Example: an attacker writes a blocked instruction with inserted punctuation and look-alike characters, such as disguising a request to reveal a password, so a simple screening model misses the phrase while the LLM still interprets the request correctly.*
+
+## Prompt injection in agent workflows
+
+When an LLM can use tools or delegate work, prompt injection can affect operations as well as generated text. These capabilities can extend existing attack paths and increase their impact; they do not make the threats exclusive to agents or turn model instructions into authorization.
+
+- **Goal hijacking:** Untrusted content redirects the agent from its intended task toward an attacker-chosen objective.
+  - *Example: a vendor email tells a document assistant to ignore its summary task and send confidential pricing to the sender; the assistant follows the new goal and discloses the pricing.*
+- **Tool misuse:** An agent uses a legitimate tool for an unauthorized purpose because it follows attacker-controlled instructions.
+  - *Example: the injected email asks the assistant to search internal files and send a pricing document to an external address; the attacker obtains data the email itself could not access.*
+- **Identity and privilege abuse:** The agent's user or service identity may have broader permissions than the person or content that influenced it.
+  - *Example: an assistant acts with a service account that can read every department's files, so an injected request in a vendor email exposes another department's confidential contract.*
+- **Insecure agent-to-agent communication:** A receiving agent may trust a delegated request or result without verifying its source, integrity, or scope.
+  - *Example: an attacker able to alter messages on an unprotected agent handoff inserts a false approval for a refund; the receiving agent issues it, transferring money to the attacker.*
+- **Cascading actions:** An agent's autonomous follow-up steps can carry an injected instruction or mistaken result into additional operations.
+  - *Example: after an injected email causes an assistant to change a supplier's payment details, an automated workflow uses the changed details for the next invoice, redirecting the payment to the attacker.*
+
 ## Multi-turn and context-building attacks
 
 Prompt injection can be spread across a conversation. No single message has to look dangerous; the combined context can gradually move the model toward an unsafe state.
@@ -36,8 +52,8 @@ Prompt injection can be spread across a conversation. No single message has to l
   - *Example: the attacker first establishes a fictional “security audit” scenario in which disclosure is portrayed as authorized, then introduces a real request for restricted information.*
 - **Adaptive probing:** Use refusals and partial successes to learn which wording or intermediate steps are effective.
   - *Example: after a guardrail rejects a request to reveal a confidential project codename, the attacker tries progressively less direct variants—asking for the name used internally, then its initials, then a clue about what it rhymes with—using each response to shape the next attempt.*
-- **Persistent-context abuse:** Plant instructions or false state in conversation history or application memory so they influence later turns.
-  - *Example: an attacker causes shared memory to record that they are an approved administrator, and a later session uses that false state when deciding how to answer.*
+- **Persistent-context abuse (memory/context poisoning):** Plant instructions or false state in conversation history or application memory so they influence later turns.
+  - *Example: an attacker causes shared memory to record that they are an approved administrator, and a later session uses that false state when deciding how to answer, potentially exposing information or authorizing actions the attacker could not request directly.*
 ## Jailbreaking
 
 Jailbreaking is prompt injection aimed at bypassing safety restrictions on model behavior. Those restrictions can come from safety/alignment training, system or developer instructions, and runtime guardrails. The goal is what makes it a jailbreak: getting the application to produce behavior its safety policy was intended to prevent, regardless of which layer is bypassed.

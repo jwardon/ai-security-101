@@ -15,7 +15,7 @@ flowchart LR
 
 ## Frameworks that help
 
-No single framework covers every part of AI security. These three are useful for different purposes:
+No single framework covers every part of AI security. These four are useful for different purposes:
 
 - **[STRIDE](https://learn.microsoft.com/en-us/azure/security/develop/threat-modeling-tool-threats) - broad system threat categories.** STRIDE is an acronym for:
   - **Spoofing:** pretending to be another identity.
@@ -27,15 +27,17 @@ No single framework covers every part of AI security. These three are useful for
   It is useful for systematically reviewing components, data flows, and trust boundaries.
 - **[MITRE ATLAS](https://atlas.mitre.org/) - Adversarial Threat Landscape for Artificial Intelligence Systems.** It is a living knowledge base of AI-focused adversary tactics and techniques: tactics describe adversary goals, while techniques describe methods used to achieve them. Use it when asking how a real attacker might achieve an objective against models, data, or AI-enabled applications, and when planning threat-informed testing or red-team scenarios.
 - **[OWASP Top 10 for LLM Applications 2026](https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/) - recurring application risks and mitigations.** OWASP organizes common implementation risks such as prompt injection, sensitive-information disclosure, supply-chain weaknesses, and excessive agency. It is useful as an application-security checklist and mitigation reference, especially for generative-AI systems.
-They overlap but are not interchangeable. STRIDE helps find broad threat classes in your architecture; ATLAS adds concrete AI adversary behaviors and attack paths; OWASP helps check common GenAI implementation risks and practical mitigations. A reasonable review may use one, two, or all three depending on scope—there is no industry requirement to run them in a fixed sequence.
+- **[OWASP Top 10 for Agentic Applications 2026](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/) - risks involving agents' goals, actions, authority, state, and interactions.** Use it alongside the LLM Top 10 when an application gives a model the ability to act or delegate work.
+These frameworks describe different layers of risk, not competing classifications. STRIDE helps find broad threat classes in the architecture; ATLAS describes AI adversary tactics and techniques; the OWASP LLM Top 10 covers application risks involving LLMs; and the OWASP Agentic Top 10 adds risks from agent autonomy, authority, state, tools, and interactions. A single incident can fit all four, and a review can use whichever combination fits its scope.
 
 ### Example: indirect prompt injection in a document assistant
 
-A document assistant summarizes incoming vendor emails and can search internal files and draft replies. An attacker sends an email containing instructions to ignore the summary task, retrieve confidential pricing, and send it to an external address.
+A document assistant summarizes incoming vendor emails and has tools to search internal files and draft or send replies. An attacker sends an email with hidden instructions to retrieve confidential pricing and send it to an attacker-controlled address. The assistant follows the injected instructions and uses its authorized tools to retrieve and disclose the data.
 
-- **STRIDE** highlights **Information Disclosure** if confidential data reaches the attacker, and potentially **Elevation of Privilege** if the assistant uses its broader tool permissions on the sender's behalf. It frames the impact and trust-boundary concerns, not the AI-specific attack technique.
-- **MITRE ATLAS** maps the attack to the [Execution tactic (AML.TA0005)](https://atlas.mitre.org/tactics/AML.TA0005) → [LLM Prompt Injection technique (AML.T0051)](https://atlas.mitre.org/techniques/AML.T0051): the attacker embeds instructions in an email the assistant ingests, fitting the technique, and intends the assistant to act on those instructions, fitting the tactic. This mapping can inform threat-driven tests.
-- **OWASP** maps the scenario to [LLM01:2026 Prompt Injection](https://github.com/GenAI-Security-Project/GenAI-LLM-Top10/blob/main/2026/final/LLM01_PromptInjection.md) because the email contains instructions intended to alter the assistant's behavior, and [LLM03:2026 Excessive Agency](https://github.com/GenAI-Security-Project/GenAI-LLM-Top10/blob/main/2026/final/LLM03_ExcessiveAgency.md) because the assistant's broad tool access could let it retrieve and transmit data without appropriate controls.
+- **STRIDE** describes the impact as **Information Disclosure** and the trust-boundary failure that lets untrusted email content influence actions through the assistant's tools.
+- **MITRE ATLAS** maps the initial attack to the [Execution tactic (AML.TA0005)](https://atlas.mitre.org/tactics/AML.TA0005) → [LLM Prompt Injection technique (AML.T0051)](https://atlas.mitre.org/techniques/AML.T0051): the attacker embeds instructions in an email the assistant ingests, fitting the technique, and intends the assistant to act on those instructions, fitting the tactic. This mapping can inform threat-driven tests.
+- **OWASP LLM Top 10 2026** applies [LLM01: Prompt Injection](https://github.com/GenAI-Security-Project/GenAI-LLM-Top10/blob/main/2026/final/LLM01_PromptInjection.md) to the malicious email and [LLM03: Excessive Agency](https://github.com/GenAI-Security-Project/GenAI-LLM-Top10/blob/main/2026/final/LLM03_ExcessiveAgency.md) to the broad, weakly constrained tool access that enables the disclosure.
+- **OWASP Agentic Top 10 2026** describes the agent-specific layers: **ASI01: Agent Goal Hijack** for the attacker's redirection of the task and **ASI02: Tool Misuse and Exploitation** for using the assistant's tools to disclose data. The classifications overlap by design; each emphasizes a different part of the same path.
 
 ## Risk assessment
 
