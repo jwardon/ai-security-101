@@ -14,7 +14,9 @@ on:
 permissions:
   contents: none
   copilot-requests: write
-engine: copilot
+engine:
+  id: copilot
+  bare: true
 checkout: false
 features:
   action-mode: release
