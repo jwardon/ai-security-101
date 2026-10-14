@@ -1,7 +1,7 @@
-#!/usr/bin/env bash
+#!/bin/sh
 # Build the guide as a PDF from the canonical Markdown. Does not modify the sources.
 # Usage: scripts/build_pdf.sh <version> [revisions.md] [preview]
-set -euo pipefail
+set -eu
 
 version="${1:?usage: build_pdf.sh <version> [revisions.md]}"
 revisions="${2:-}"
@@ -18,7 +18,7 @@ cd "$root"
 title="AI Security 101"
 suffix=""
 if [ "$preview" = "preview" ]; then
-  title+=" - PREVIEW"
+  title="$title - PREVIEW"
   suffix="-PREVIEW"
 fi
 
@@ -37,13 +37,10 @@ combined="$out/ai-security-101.md"
   fi
 } > "$combined"
 
-# Mermaid diagrams are rendered by scripts/mermaid.lua. MMDC and MERMAID_CHROME can override the defaults.
-export MERMAID_OUT_DIR="$out/diagrams"
-
 pandoc "$combined" \
   --from markdown-smart-tex_math_dollars-raw_tex-yaml_metadata_block-blank_before_header+autolink_bare_uris+pipe_tables \
   --pdf-engine=xelatex \
-  --lua-filter="$root/scripts/mermaid.lua" \
+  --lua-filter=scripts/mermaid.lua \
   --toc --toc-depth=2 \
   --metadata title="$title" \
   --metadata subtitle="Version $version" \
