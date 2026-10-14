@@ -5,7 +5,8 @@
 #   1. author of an issue the pull request closes
 #   2. author of the pull request
 #   3. user who merged the pull request
-#   4. the fallback login (the user who triggered the run)
+#   4. author of the commit, when linked to a human account
+#   5. the fallback login (the user who triggered the run)
 # Requires GH_TOKEN and GITHUB_REPOSITORY.
 set -euo pipefail
 
@@ -36,6 +37,13 @@ if [ -n "$pr" ]; then
     echo "$human"
     exit 0
   fi
+fi
+
+commit_author="$(gh api "repos/${GITHUB_REPOSITORY}/commits/${sha}" \
+  --jq 'select(.author != null and .author.type == "User") | .author.login' 2>/dev/null || true)"
+if [ -n "$commit_author" ]; then
+  echo "$commit_author"
+  exit 0
 fi
 
 echo "$fallback"
