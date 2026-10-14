@@ -31,6 +31,7 @@ The author in a revision is the human who originated the change, not the agent o
 3. The user who merged the pull request.
 4. The target commit's author, if linked to a human GitHub account.
 5. The user who triggered the workflow run, for runs without an associated pull request such as manual runs.
+
 Bot accounts, including Copilot, are skipped when resolving issue, pull request, merger, and commit authors. The pull request is the one passed in by the `pull_request` event or, on pushes to `main`, the one associated with the pushed commit. In the Revisions table, the author is shown as `Display Name (@login)`, using the public name on the user's GitHub profile (looked up through the users API at build time, so nothing is hard-coded). If the account has no public name, or the lookup fails, only `@login` is shown. The resolved login is stored in a hidden `<!-- author: login -->` comment at the end of the release notes, so later builds credit the same person instead of the account that published the release. Releases without a valid human author marker resolve the human associated with their target commit; the release publisher is only a final fallback.
 
 ## Diagrams
