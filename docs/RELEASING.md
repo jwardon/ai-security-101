@@ -35,7 +35,7 @@ Bot accounts, including Copilot, are skipped in steps 1–3. The pull request is
 
 ## Diagrams
 
-Diagrams in the guide are Mermaid code blocks. GitHub renders them natively in Markdown. For the PDF, `scripts/mermaid.lua` extracts each block and later embeds its PNG; `scripts/build_pdf.sh` renders the images in the official Mermaid CLI container, separately from PDF generation in the official Pandoc/LaTeX container. Both image references are pinned by digest in that script, and the generated diagram files are shared through the ignored `build/diagrams/` directory. Simple inline arrow examples stay as plain text. All diagrams are rendered with one shared Mermaid configuration (font size, spacing, theme) and at their natural size, so type size is consistent. Anything wider than the text block is scaled down to fit, so keep diagrams narrow: use short labels, wrap with `<br/>`, and prefer vertical layouts over long horizontal chains.
+Diagrams in the guide are Mermaid code blocks. GitHub renders them natively in Markdown. For the PDF, the `render-diagrams` job extracts and renders the images in the official Mermaid CLI container, then passes them to the `build` job as an Actions artifact. The PDF job runs in the official Pandoc/LaTeX container; both image references are pinned by digest in `.github/workflows/release-pdf.yml`. `scripts/mermaid.lua` embeds the matching PNG in the PDF, while `scripts/build_pdf.sh` handles deterministic document construction. Simple inline arrow examples stay as plain text. All diagrams are rendered with one shared Mermaid configuration (font size, spacing, theme) and at their natural size, so type size is consistent. Anything wider than the text block is scaled down to fit, so keep diagrams narrow: use short labels, wrap with `<br/>`, and prefer vertical layouts over long horizontal chains.
 
 ## Release summary
 
@@ -58,13 +58,21 @@ Pull-request PDF artifacts are clearly marked as previews: the text `- PREVIEW` 
 - Actions and GitHub Agentic Workflows with Copilot must be enabled for the repository or its organization. The summarization agent receives only `copilot-requests: write`; it has no repository content or release permissions. Its isolated safe-output job can upload only the one temporary summary artifact. The PDF build job requests only `contents: read`; the `prepare` job additionally holds the `pull-requests: read` and `issues: read` permissions needed to resolve revision authors, and `contents: write` is limited to the publish job.
 - To keep releases immutable, enable **Settings → General → Releases → Enable release immutability**. Changes should then be published as a new release.
 - Third-party actions are pinned to commit SHAs. Update the pins deliberately, for example with Dependabot.
-- The PDF build requires Docker and uses digest-pinned upstream Mermaid CLI and Pandoc/LaTeX images instead of installing Pandoc, TeX, Mermaid CLI, or Chrome on the runner.
+- The workflow uses digest-pinned upstream Mermaid CLI and Pandoc/LaTeX containers instead of installing Mermaid CLI, Chrome, Pandoc, or TeX on the runner.
 
 ## Local build
 
-Requires Docker. The build pulls the digest-pinned Mermaid CLI and Pandoc/LaTeX images the first time it runs:
+The build script requires `pandoc`, `xelatex`, and the rendered diagrams in `build/diagrams/`. In CI, separate jobs provide the diagrams and run the PDF build in the pinned containers. To render diagrams locally with Docker, run the official Mermaid CLI image and then build with a local Pandoc/LaTeX installation:
 
 ```sh
+docker run --rm \
+  --user "$(id -u):$(id -g)" \
+  --env HOME=/tmp \
+  --volume "$PWD:/data" \
+  --workdir /data \
+  --entrypoint /bin/sh \
+  ghcr.io/mermaid-js/mermaid-cli/mermaid-cli:11.12.0@sha256:bad64c9d9ad917c8dfbe9d9e9c162b96f6615ff019b37058638d16eb27ce7783 \
+  -c 'node scripts/render_mermaid.js'
 scripts/build_pdf.sh 2026-01-31
 ```
 
